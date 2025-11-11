@@ -1,15 +1,13 @@
-import { Text, View } from "react-native";
+import React, { useEffect } from 'react';
+import { View } from 'react-native';
 
-export default function Index() {
+import IndexComponent from '../src/components/indexComponent';
+import colors from '../constants/colors';
+
+export default function HomeScreen() {
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Text>Edit app/index.tsx to edit this screen.</Text>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <IndexComponent />
     </View>
   );
 }

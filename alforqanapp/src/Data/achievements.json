@@ -1,0 +1,18 @@
+[
+  {
+    "id": 1,
+    "year": 2023,
+    "title": "تنظيف الأحياء المجاورة",
+    "category": "خدمة المجتمع",
+    "description": "إنجاز رائع في مجال خدمة المجتمع يعكس هذا الجهد.",
+    "image": "https://raw.githubusercontent.com/houssamWaked/alforqan-scout/main/alforqanapp/src/images/community1.jpg"
+  },
+  {
+    "id": 2,
+    "year": 2022,
+    "title": "مخيم الشتاء الكشفي",
+    "category": "المخيمات",
+    "description": "إنجاز رائع في مجال المخيمات يعكس هذا الجهد.",
+    "image": "https://raw.githubusercontent.com/houssamWaked/alforqan-scout/main/alforqanapp/src/images/camp1.jpg"
+  }
+]
