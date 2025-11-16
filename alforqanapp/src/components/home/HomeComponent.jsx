@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -42,6 +42,11 @@ export default function HomeComponent() {
   const styles = useThemedStyles(homeStyles);
   const { colors, scheme, toggleScheme } = useTheme();
 
+  const topThree = useMemo(
+    () => achievements.slice(0, 3),
+    [achievements]
+  );
+
   return (
     <ScrollView style={styles.container}>
       {/* Header */}
@@ -71,7 +76,7 @@ export default function HomeComponent() {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={{ paddingVertical: 6 }}
         >
-          {achievements.map((item) => (
+          {topThree.map((item) => (
             <View key={item.id} style={styles.achievementCard}>
               <Image
                 source={{ uri: item.image }}

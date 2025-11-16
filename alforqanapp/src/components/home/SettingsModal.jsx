@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  Modal,
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-} from 'react-native';
+import { Modal, View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useTheme } from '../../hooks/useTheme';
 
 export default function SettingsModal({ visible, onClose }) {
@@ -33,19 +27,34 @@ export default function SettingsModal({ visible, onClose }) {
           </Text>
 
           <View style={styles.items}>
-            <TouchableOpacity style={styles.item} activeOpacity={0.7}>
+            <TouchableOpacity
+              style={styles.item}
+              activeOpacity={0.7}
+              accessibilityRole="button"
+              accessibilityLabel="تغيير المظهر"
+            >
               <Text style={[styles.itemText, { color: colors.text }]}>
                 المظهر (قريبًا)
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.item} activeOpacity={0.7}>
+            <TouchableOpacity
+              style={styles.item}
+              activeOpacity={0.7}
+              accessibilityRole="button"
+              accessibilityLabel="عن التطبيق"
+            >
               <Text style={[styles.itemText, { color: colors.text }]}>
                 عن التطبيق
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.item} activeOpacity={0.7}>
+            <TouchableOpacity
+              style={styles.item}
+              activeOpacity={0.7}
+              accessibilityRole="button"
+              accessibilityLabel="الشروط والأحكام"
+            >
               <Text style={[styles.itemText, { color: colors.text }]}>
                 الشروط والأحكام
               </Text>
@@ -112,4 +121,3 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 });
-

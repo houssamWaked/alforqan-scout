@@ -4,7 +4,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { useTheme } from '../../src/hooks/useTheme';
 import { ThemeProvider } from '../../src/context/ThemeContext';
 import TAB_TEXTS from '../../constants/texts/tabTexts';
-import { Dimensions, View } from 'react-native';
+import { Dimensions, Platform, View } from 'react-native';
 
 function TabsContent({ insets }) {
   const { colors } = useTheme();
@@ -22,11 +22,12 @@ function TabsContent({ insets }) {
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.subText,
         tabBarShowLabel: false,
+        tabBarHideOnKeyboard: true,
 
         // --- INSTAGRAM TAB BAR STYLE ---
         tabBarStyle: {
           backgroundColor: colors.card,
-          borderTopWidth: 1,
+          borderTopWidth: Platform.OS === 'web' ? 0.5 : 1,
           borderTopColor: colors.border,
 
           position: 'absolute',
@@ -34,8 +35,8 @@ function TabsContent({ insets }) {
           right: 0,
           bottom: 0, // Instagram = pinned to the VERY bottom
 
-          height: 52,
-          paddingBottom: 6,
+          height: isTablet ? 64 : 56,
+          paddingBottom: isSmallPhone ? 4 : 8,
           paddingTop: 6,
 
           borderRadius: 0,
@@ -49,11 +50,31 @@ function TabsContent({ insets }) {
         options={{
           title: TAB_TEXTS.home,
           tabBarIcon: ({ focused, color }) => (
-            <Ionicons
-              name={focused ? 'home' : 'home-outline'}
-              size={ICON}
-              color={color}
-            />
+            <View
+              style={{
+                alignItems: 'center',
+                justifyContent: 'center',
+                paddingHorizontal: 8,
+                paddingVertical: focused ? 4 : 2,
+              }}
+            >
+              <Ionicons
+                name={focused ? 'home' : 'home-outline'}
+                size={ICON}
+                color={color}
+              />
+              {focused && (
+                <View
+                  style={{
+                    marginTop: 3,
+                    width: 18,
+                    height: 3,
+                    borderRadius: 999,
+                    backgroundColor: colors.primary,
+                  }}
+                />
+              )}
+            </View>
           ),
         }}
       />

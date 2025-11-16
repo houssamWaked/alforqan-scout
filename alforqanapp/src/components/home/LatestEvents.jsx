@@ -1,17 +1,61 @@
-import React from 'react';
-import { View, Text, FlatList, TouchableOpacity, Image } from 'react-native';
+import React, { useCallback, useMemo, useRef } from 'react';
+import {
+  View,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  Image,
+  Animated,
+} from 'react-native';
 import homeStyles from '../../Styles/HomeStyleSheet';
 import { useThemedStyles } from '../../hooks/useThemedStyles';
 import { HOME_TEXT } from '../../../constants/texts/homeTexts';
 
 export default function LatestEvents({ events }) {
   const styles = useThemedStyles(homeStyles);
-  const renderItem = ({ item }) => (
-    <TouchableOpacity style={styles.eventCard}>
-      <Image source={{ uri: item.image }} style={styles.eventImage} />
-      <Text style={styles.eventTitle}>{item.title}</Text>
-      <Text style={styles.eventDate}>{item.date}</Text>
-    </TouchableOpacity>
+  const scale = useRef(new Animated.Value(1)).current;
+
+  const handlePressIn = () => {
+    Animated.spring(scale, {
+      toValue: 0.97,
+      useNativeDriver: true,
+      speed: 20,
+      bounciness: 6,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(scale, {
+      toValue: 1,
+      useNativeDriver: true,
+      speed: 20,
+      bounciness: 6,
+    }).start();
+  };
+
+  const renderItem = useCallback(
+    ({ item }) => (
+      <Animated.View style={{ transform: [{ scale }] }}>
+        <TouchableOpacity
+          style={styles.eventCard}
+          onPressIn={handlePressIn}
+          onPressOut={handlePressOut}
+          activeOpacity={0.85}
+          accessibilityRole="button"
+          accessibilityLabel={item.title}
+        >
+          <Image
+            source={{ uri: item.image }}
+            style={styles.eventImage}
+            accessible
+            accessibilityLabel={item.title}
+          />
+          <Text style={styles.eventTitle}>{item.title}</Text>
+          <Text style={styles.eventDate}>{item.date}</Text>
+        </TouchableOpacity>
+      </Animated.View>
+    ),
+    [handlePressIn, handlePressOut, scale, styles.eventCard, styles.eventDate, styles.eventImage, styles.eventTitle]
   );
 
   return (

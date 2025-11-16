@@ -14,18 +14,19 @@ const createStyles = (palette) =>
     },
 
     container: {
-      maxWidth: 480,
+      maxWidth: 520,
       width: '100%',
       alignSelf: 'center',
-      padding: 16,
+      paddingHorizontal: 16,
+      paddingTop: 12,
       paddingBottom: 40,
     },
 
     sectionHeader: {
       flexDirection: 'row',
       justifyContent: 'space-between',
-      marginBottom: 10,
-      marginTop: 12,
+      marginBottom: 12,
+      marginTop: 16,
     },
 
     sectionContainer: {
@@ -41,15 +42,17 @@ const createStyles = (palette) =>
     },
 
     pinnedBox: {
-      backgroundColor: '#E8F5E9',
+      backgroundColor: palette.card,
       padding: 16,
-      borderRadius: 16,
+      borderRadius: 20,
+      borderWidth: 1,
+      borderColor: palette.border,
       shadowColor: '#000',
-      shadowOpacity: 0.06,
-      shadowOffset: { width: 0, height: 3 },
-      shadowRadius: 6,
-      elevation: 3,
-      marginBottom: 16,
+      shadowOpacity: 0.08,
+      shadowOffset: { width: 0, height: 4 },
+      shadowRadius: 10,
+      elevation: 4,
+      marginBottom: 18,
     },
     pinnedTitle: {
       fontSize: 17,
@@ -66,14 +69,16 @@ const createStyles = (palette) =>
     },
 
     eventCard: {
-      width: 165,
+      width: 180,
       backgroundColor: palette.card,
-      borderRadius: 16,
+      borderRadius: 18,
       padding: 10,
       marginRight: 12,
       shadowColor: '#000',
-      shadowOpacity: 0.05,
-      elevation: 2,
+      shadowOpacity: 0.06,
+      shadowOffset: { width: 0, height: 3 },
+      shadowRadius: 6,
+      elevation: 3,
     },
 
     eventImage: {
@@ -100,19 +105,19 @@ const createStyles = (palette) =>
     actionsContainer: {
       flexDirection: 'row',
       justifyContent: 'space-between',
-      marginTop: 14,
+      marginTop: 18,
     },
 
     actionButton: {
       flex: 1,
       backgroundColor: palette.card,
-      borderRadius: 16,
-      paddingVertical: 18,
+      borderRadius: 18,
+      paddingVertical: 16,
       marginHorizontal: 6,
       alignItems: 'center',
       shadowColor: '#000',
-      shadowOpacity: 0.05,
-      elevation: 2,
+      shadowOpacity: 0.06,
+      elevation: 3,
     },
 
     actionIcon: {
