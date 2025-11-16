@@ -23,10 +23,13 @@ export default function ContactUsScreen() {
   } = useContactForm();
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={[styles.safeArea, { flex: 1 }]}>
       <ScrollView
-        style={styles.scroll}
-        contentContainerStyle={styles.container}
+        style={[styles.scroll, { flex: 1 }]}
+        contentContainerStyle={[
+          styles.container,
+          { paddingBottom: 120 }, // keep content above tab bar
+        ]}
         keyboardShouldPersistTaps="handled"
       >
         <ContactUsComponent

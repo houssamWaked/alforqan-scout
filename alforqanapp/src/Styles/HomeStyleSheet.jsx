@@ -241,6 +241,24 @@ const createStyles = (palette) =>
       marginTop: 18,
       lineHeight: 18,
     },
+    settingsRow: {
+      width: '100%',
+      alignItems: 'flex-end',
+      marginBottom: 12,
+    },
+    settingsButton: {
+      width: 38,
+      height: 38,
+      borderRadius: 19,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: palette.card,
+      shadowColor: '#000',
+      shadowOpacity: 0.08,
+      shadowOffset: { width: 0, height: 2 },
+      shadowRadius: 4,
+      elevation: 3,
+    },
   });
 
 const homeStyles = {

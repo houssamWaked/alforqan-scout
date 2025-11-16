@@ -12,8 +12,15 @@ export default function AboutUsScreen() {
   const aboutContent = useAboutUs();
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <ScrollView style={styles.scroll} contentContainerStyle={styles.container}>
+    <SafeAreaView style={[styles.safeArea, { flex: 1 }]}>
+      <ScrollView
+        style={[styles.scroll, { flex: 1 }]}
+        contentContainerStyle={[
+          styles.container,
+          { paddingBottom: 120 }, // keeps last section above tab bar
+        ]}
+        showsVerticalScrollIndicator={false}
+      >
         <AboutUsComponent {...aboutContent} />
       </ScrollView>
     </SafeAreaView>
