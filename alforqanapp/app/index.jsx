@@ -1,10 +1,12 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { View } from 'react-native';
 
 import IndexComponent from '../src/components/indexComponent';
-import colors from '../constants/colors';
+import { useTheme } from '../src/hooks/useTheme';
 
 export default function HomeScreen() {
+  const { colors } = useTheme();
+
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
       <IndexComponent />

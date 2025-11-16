@@ -1,42 +1,24 @@
-import React, { useCallback, useEffect, useRef } from 'react';
-import {
-  View,
-  Text,
-  Image,
-  TouchableOpacity,
-  Animated,
-  Easing,
-} from 'react-native';
-import { useRouter } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import React from 'react';
+import { View, Text, TouchableOpacity, Animated } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import styles from '../Styles/indexStyleSheet';
-import colors from '../../constants/colors';
+import { useRouter } from 'expo-router';
+
+import { useFadeAndScale } from '../hooks/useFadeAndScale';
+import { setOnboardingSeen } from '../services/onboardingService';
+
+import stylesSheet from '../Styles/indexStyleSheet';
+import { useThemedStyles } from '../hooks/useThemedStyles';
+import { useTheme } from '../hooks/useTheme';
 import typography from '../../constants/typography';
+import TEXT from '../../constants/texts/indexText';
 
 export default function IndexComponent() {
   const router = useRouter();
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const logoScale = useRef(new Animated.Value(1.12)).current;
+  const { fadeAnim, scaleAnim } = useFadeAndScale();
+  const styles = useThemedStyles(stylesSheet);
+  const { colors } = useTheme();
 
-  useEffect(() => {
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 900,
-        easing: Easing.out(Easing.exp),
-        useNativeDriver: true,
-      }),
-      Animated.spring(logoScale, {
-        toValue: 1,
-        stiffness: 200,
-        damping: 12,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, [fadeAnim, logoScale]);
-
-  const animatedContentStyle = {
+  const animatedStyle = {
     opacity: fadeAnim,
     transform: [
       {
@@ -48,14 +30,10 @@ export default function IndexComponent() {
     ],
   };
 
-  const handleExplorePress = useCallback(async () => {
-    try {
-      await AsyncStorage.setItem('hasSeenWelcome', 'true');
-      router.replace('/(tabs)/Home');
-    } catch (error) {
-      console.error('Failed to save onboarding state', error);
-    }
-  }, [router]);
+  const handleExplore = async () => {
+    await setOnboardingSeen();
+    router.replace('/(tabs)/Home');
+  };
 
   return (
     <LinearGradient
@@ -64,29 +42,24 @@ export default function IndexComponent() {
       end={{ x: 1, y: 1 }}
       style={styles.gradient}
     >
-      <Animated.View style={[styles.contentBox, animatedContentStyle]}>
+      <Animated.View style={[styles.contentBox, animatedStyle]}>
         <View style={styles.logoCircle}>
           <Animated.Image
             source={require('../../assets/images/Logo.png')}
-            style={[styles.logo, { transform: [{ scale: logoScale }] }]}
+            style={[styles.logo, { transform: [{ scale: scaleAnim }] }]}
           />
         </View>
 
-        <Text style={[typography.headings.h2, styles.title]}>
-          كشافة الفرقان الإسلامي
-        </Text>
-
+        <Text style={[typography.headings.h2, styles.title]}>{TEXT.title}</Text>
         <Text style={[typography.headings.h3, styles.subtitle]}>
-          كن مستعداً
+          {TEXT.subtitle}
         </Text>
-
         <Text style={[typography.body.small, styles.description]}>
-          نغرس قيم الإيمان، القيادة، والخدمة في شبابنا لبناء جيل ملتزم يخدم وطنه
-          وأمته.
+          {TEXT.description}
         </Text>
 
-        <TouchableOpacity style={styles.button} onPress={handleExplorePress}>
-          <Text style={styles.buttonText}>استكشف المزيد</Text>
+        <TouchableOpacity style={styles.button} onPress={handleExplore}>
+          <Text style={styles.buttonText}>{TEXT.exploreButton}</Text>
         </TouchableOpacity>
       </Animated.View>
     </LinearGradient>

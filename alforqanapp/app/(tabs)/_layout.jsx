@@ -1,29 +1,30 @@
-// app/(tabs)/_layout.jsx
 import { Tabs } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import colors from '../../constants/colors';
+import { useTheme } from '../../src/hooks/useTheme';
+import { ThemeProvider } from '../../src/context/ThemeContext';
+import TAB_TEXTS from '../../constants/texts/tabTexts';
 
-export default function TabLayout() {
-  const insets = useSafeAreaInsets();
+function TabsContent({ insets }) {
+  const { colors } = useTheme();
 
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.light.secondary,
+        tabBarInactiveTintColor: colors.subText,
         tabBarStyle: {
-          backgroundColor: colors.white,
-          borderTopWidth: 1,
+          backgroundColor: colors.card,
+          borderTopWidth: 2,
           borderTopColor: colors.border,
-          paddingTop: 5,
-          paddingBottom: Math.max(insets.bottom, 8),
+          paddingTop: 1,
+          paddingBottom: Math.max(insets.bottom, 4),
           height: 60 + insets.bottom,
           position: 'absolute',
           left: 10,
           right: 10,
-          bottom: insets.bottom ? insets.bottom : 10,
+          bottom: insets.bottom ? insets.bottom : 15,
           borderRadius: 20,
         },
         tabBarLabelStyle: {
@@ -35,12 +36,12 @@ export default function TabLayout() {
       <Tabs.Screen
         name="Home"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ focused, color }) => (
-            <Ionicons
-              name={focused ? 'home' : 'home-outline'}
-              size={24}
-              color={color}
+          title: TAB_TEXTS.home,
+        tabBarIcon: ({ focused, color }) => (
+          <Ionicons
+            name={focused ? 'home' : 'home-outline'}
+            size={24}
+            color={color}
             />
           ),
         }}
@@ -49,12 +50,12 @@ export default function TabLayout() {
       <Tabs.Screen
         name="Achievements"
         options={{
-          title: 'Achievements',
-          tabBarIcon: ({ focused, color }) => (
-            <Ionicons
-              name={focused ? 'checkbox' : 'checkbox-outline'}
-              size={24}
-              color={color}
+          title: TAB_TEXTS.achievements,
+        tabBarIcon: ({ focused, color }) => (
+          <Ionicons
+            name={focused ? 'checkbox' : 'checkbox-outline'}
+            size={24}
+            color={color}
             />
           ),
         }}
@@ -63,12 +64,12 @@ export default function TabLayout() {
       <Tabs.Screen
         name="PhotoGallery"
         options={{
-          title: 'Albums',
-          tabBarIcon: ({ focused, color }) => (
-            <Ionicons
-              name={focused ? 'images' : 'images-outline'}
-              size={24}
-              color={color}
+          title: TAB_TEXTS.photoGallery,
+        tabBarIcon: ({ focused, color }) => (
+          <Ionicons
+            name={focused ? 'images' : 'images-outline'}
+            size={24}
+            color={color}
             />
           ),
         }}
@@ -77,16 +78,40 @@ export default function TabLayout() {
       <Tabs.Screen
         name="ContactUs"
         options={{
-          title: 'Contact Us',
-          tabBarIcon: ({ focused, color }) => (
-            <Ionicons
-              name={focused ? 'person' : 'person-outline'}
-              size={24}
-              color={color}
+          title: TAB_TEXTS.contactUs,
+        tabBarIcon: ({ focused, color }) => (
+          <Ionicons
+            name={focused ? 'person' : 'person-outline'}
+            size={24}
+            color={color}
+            />
+          ),
+        }}
+      />
+
+      <Tabs.Screen
+        name="Settings"
+        options={{
+          title: TAB_TEXTS.settings,
+        tabBarIcon: ({ focused, color }) => (
+          <Ionicons
+            name={focused ? 'settings' : 'settings-outline'}
+            size={24}
+            color={color}
             />
           ),
         }}
       />
     </Tabs>
+  );
+}
+
+export default function TabLayout() {
+  const insets = useSafeAreaInsets();
+
+  return (
+    <ThemeProvider>
+      <TabsContent insets={insets} />
+    </ThemeProvider>
   );
 }

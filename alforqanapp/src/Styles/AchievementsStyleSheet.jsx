@@ -1,85 +1,160 @@
 import { StyleSheet } from 'react-native';
-import colors from '../../constants/colors';
-import sizing from '../../constants/sizing';
+import { COLOR_SCHEMES } from '../../constants/colors';
 
-export default StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-    padding: sizing.spacing.md,
-  },
-  header: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    textAlign: 'right',
-    color: colors.primary,
-    marginBottom: sizing.spacing.md,
-  },
-  filterRow: {
-    flexDirection: 'row-reverse',
-    justifyContent: 'flex-start',
-    flexWrap: 'wrap',
-    marginBottom: sizing.spacing.md,
-  },
-  filterButton: {
-    backgroundColor: colors.card,
-    borderRadius: sizing.radius.md,
-    paddingVertical: 6,
-    paddingHorizontal: 14,
-    marginLeft: 8,
-    marginBottom: 8,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  filterButtonActive: {
-    backgroundColor: colors.primary,
-  },
-  filterText: {
-    color: colors.text,
-    fontSize: 14,
-  },
-  filterTextActive: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  cardGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-  },
-  card: {
-    width: '48%',
-    backgroundColor: colors.card,
-    borderRadius: sizing.radius.md,
-    marginBottom: sizing.spacing.md,
-    padding: sizing.spacing.sm,
-    borderWidth: 1,
-    borderColor: colors.border,
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  cardImage: {
-    width: '100%',
-    height: 110,
-    borderRadius: sizing.radius.sm,
-    marginBottom: 8,
-  },
-  year: {
-    fontSize: 13,
-    color: colors.primary,
-    textAlign: 'right',
-  },
-  title: {
-    fontWeight: 'bold',
-    fontSize: 15,
-    textAlign: 'right',
-    color: colors.text,
-  },
-  desc: {
-    fontSize: 13,
-    textAlign: 'right',
-    color: colors.subText,
-  },
-});
+const createStyles = (palette) =>
+  StyleSheet.create({
+    safeArea: {
+      flex: 1,
+      backgroundColor: palette.background,
+    },
+    scroll: {
+      flex: 1,
+    },
+    container: {
+      maxWidth: 480,
+      width: '100%',
+      alignSelf: 'center',
+      padding: 16,
+      paddingBottom: 40,
+    },
+
+    pageTitle: {
+      fontSize: 20,
+      fontWeight: '700',
+      color: palette.text,
+      marginBottom: 12,
+    },
+
+    filtersContainer: {
+      paddingVertical: 8,
+      paddingHorizontal: 2,
+      marginBottom: 10,
+    },
+    filterChip: {
+      paddingVertical: 6,
+      paddingHorizontal: 14,
+      borderRadius: 20,
+      borderWidth: 1,
+      borderColor: palette.border,
+      marginRight: 8,
+      backgroundColor: palette.card,
+    },
+    filterChipActive: {
+      backgroundColor: palette.primary,
+      borderColor: palette.primary,
+    },
+    filterText: {
+      fontSize: 13,
+      color: palette.subText,
+    },
+    filterTextActive: {
+      color: palette.white,
+      fontWeight: '600',
+    },
+
+    listWrapper: {
+      marginTop: 4,
+    },
+    listContent: {
+      paddingBottom: 20,
+    },
+
+    filterRow: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      marginBottom: 12,
+    },
+    filterButton: {
+      paddingVertical: 6,
+      paddingHorizontal: 14,
+      borderRadius: 20,
+      borderWidth: 1,
+      borderColor: palette.border,
+      marginRight: 8,
+      marginBottom: 8,
+      backgroundColor: palette.card,
+    },
+    filterButtonActive: {
+      backgroundColor: palette.primary,
+      borderColor: palette.primary,
+    },
+    cardGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      justifyContent: 'space-between',
+    },
+
+    card: {
+      backgroundColor: palette.card,
+      borderRadius: 16,
+      padding: 10,
+      marginBottom: 12,
+      shadowColor: '#000',
+      shadowOpacity: 0.06,
+      shadowOffset: { width: 0, height: 3 },
+      shadowRadius: 6,
+      elevation: 3,
+    },
+    cardImage: {
+      width: '100%',
+      height: 130,
+      borderRadius: 14,
+      marginBottom: 8,
+    },
+    cardHeaderRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 4,
+    },
+    badgeBubble: {
+      backgroundColor: palette.light.secondary,
+      borderRadius: 999,
+      paddingVertical: 4,
+      paddingHorizontal: 10,
+    },
+    badgeText: {
+      fontSize: 13,
+      color: palette.text,
+    },
+    yearText: {
+      fontSize: 12,
+      color: palette.subText,
+    },
+    cardTitle: {
+      fontSize: 15,
+      fontWeight: '600',
+      color: palette.text,
+      marginBottom: 4,
+    },
+    cardDescription: {
+      fontSize: 12,
+      color: palette.subText,
+      lineHeight: 18,
+    },
+
+    emptyStateWrapper: {
+      marginTop: 20,
+    },
+    year: {
+      fontSize: 12,
+      color: palette.subText,
+      marginBottom: 4,
+    },
+    title: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: palette.text,
+    },
+    desc: {
+      fontSize: 14,
+      color: palette.subText,
+    },
+  });
+
+const achievementStyles = {
+  light: createStyles(COLOR_SCHEMES.light),
+  dark: createStyles(COLOR_SCHEMES.dark),
+};
+
+export default achievementStyles;

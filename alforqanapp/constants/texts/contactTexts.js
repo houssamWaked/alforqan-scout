@@ -1,0 +1,17 @@
+export const CONTACT_TEXT = {
+  pageTitle: 'تواصل معنا',
+  formTitle: 'أرسل رسالة',
+  nameLabel: 'الاسم الكامل',
+  namePlaceholder: 'اكتب اسمك الكامل',
+  emailLabel: 'البريد الإلكتروني',
+  emailPlaceholder: 'اكتب بريدك الإلكتروني',
+  messageLabel: 'الرسالة',
+  messagePlaceholder: 'اكتب رسالتك هنا',
+  submitLabel: 'إرسال الرسالة',
+  submittingLabel: 'جارٍ الإرسال...',
+  successMessage: 'تم إرسال الرسالة بنجاح.',
+  errorRequired: 'الاسم، البريد، والرسالة جميعها مطلوبة.',
+  errorEmail: 'الرجاء إدخال بريد إلكتروني صالح.',
+  errorGeneric: 'حدث خطأ غير متوقع، يرجى المحاولة لاحقاً.',
+  socialTitle: 'تواصل عبر مواقع التواصل',
+};

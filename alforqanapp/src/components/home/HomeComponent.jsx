@@ -9,8 +9,9 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Link } from 'expo-router';
-import styles from '../Styles/HomeStyleSheet';
-import colors from '../../constants/colors';
+import homeStyles from '../../Styles/HomeStyleSheet';
+import { useThemedStyles } from '../../hooks/useThemedStyles';
+import { useTheme } from '../../hooks/useTheme';
 
 export default function HomeComponent() {
   const [achievements, setAchievements] = useState([]);
@@ -38,6 +39,9 @@ export default function HomeComponent() {
     loadAchievements();
   }, []);
 
+  const styles = useThemedStyles(homeStyles);
+  const { colors, scheme, toggleScheme } = useTheme();
+
   return (
     <ScrollView style={styles.container}>
       {/* Header */}
@@ -49,6 +53,12 @@ export default function HomeComponent() {
         <Text style={styles.greeting}>كشافة الفرقان الإسلامي</Text>
         <Text style={styles.motto}>كن مستعداً دائمًا لخدمة الله والوطن</Text>
       </View>
+
+      <TouchableOpacity style={styles.themeToggle} onPress={toggleScheme}>
+        <Text style={styles.themeToggleText}>
+          {scheme === 'dark' ? 'تفعيل وضع النهار' : 'تفعيل الوضع الليلي'}
+        </Text>
+      </TouchableOpacity>
 
       {/* Latest Achievements */}
       <Text style={styles.sectionTitle}>آخر الإنجازات</Text>

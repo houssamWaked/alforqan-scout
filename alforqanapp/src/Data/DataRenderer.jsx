@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   View,
@@ -8,31 +8,31 @@ import {
   RefreshControl,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { colors } from '../../constants/colors';
+import { useTheme } from '../hooks/useTheme';
+
+const DATA_URLS = {
+  about:
+    'https://raw.githubusercontent.com/houssamWaked/alforqan-scout/refs/heads/main/alforqanapp/src/Data/about.json',
+  achievements:
+    'https://raw.githubusercontent.com/houssamWaked/alforqan-scout/refs/heads/main/alforqanapp/src/Data/achievements.json',
+  gallery:
+    'https://raw.githubusercontent.com/houssamWaked/alforqan-scout/refs/heads/main/alforqanapp/src/Data/gallery.json',
+};
 
 // ================================
 // 💾 DataRenderer Component
 // ================================
 export default function DataRenderer({ type }) {
+  const { colors } = useTheme();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
 
-  // URLs for each dataset
-  const urls = {
-    about:
-      'https://raw.githubusercontent.com/houssamWaked/alforqan-scout/refs/heads/main/alforqanapp/src/Data/about.json',
-    achievements:
-      'https://raw.githubusercontent.com/houssamWaked/alforqan-scout/refs/heads/main/alforqanapp/src/Data/achievements.json',
-    gallery:
-      'https://raw.githubusercontent.com/houssamWaked/alforqan-scout/refs/heads/main/alforqanapp/src/Data/gallery.json',
-  };
-
   // ==========================================
   // 🔄 Fetch data with offline caching
   // ==========================================
-  const fetchData = async (forceRefresh = false) => {
+  const fetchData = useCallback(async (forceRefresh = false) => {
     const cacheKey = `cache_${type}`;
     try {
       setError(null);
@@ -47,7 +47,7 @@ export default function DataRenderer({ type }) {
       }
 
       // 2️⃣ Fetch fresh data online
-      const res = await fetch(urls[type]);
+      const res = await fetch(DATA_URLS[type]);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
 
@@ -60,21 +60,18 @@ export default function DataRenderer({ type }) {
     } catch (err) {
       console.error('Fetch error:', err.message);
       setError('Network unavailable — showing saved data.');
-      if (!data) {
-        // If no data loaded yet, try cache again
-        const cached = await AsyncStorage.getItem(cacheKey);
-        if (cached) setData(JSON.parse(cached));
-      }
+      const cached = await AsyncStorage.getItem(cacheKey);
+      if (cached) setData(JSON.parse(cached));
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
-  };
+  }, [type]);
 
   // Load once on mount
   useEffect(() => {
     fetchData();
-  }, [type]);
+  }, [fetchData]);
 
   // Pull-to-refresh
   const onRefresh = () => {
