@@ -11,19 +11,12 @@ const createStyles = (palette) =>
       flex: 1,
     },
     container: {
-      maxWidth: 480,
+      maxWidth: 520,
       width: '100%',
       alignSelf: 'center',
-      padding: 16,
+      paddingHorizontal: 16,
+      paddingTop: 12,
       paddingBottom: 40,
-    },
-
-    pageTitle: {
-      fontSize: 20,
-      fontWeight: '700',
-      color: palette.text,
-      marginBottom: 12,
-      textAlign: 'right',
     },
 
     filtersContainer: {
@@ -98,6 +91,35 @@ const createStyles = (palette) =>
       textAlign: 'center',
       color: palette.danger,
       marginBottom: 12,
+      fontSize: 14,
+    },
+
+    modalBackdrop: {
+      flex: 1,
+      backgroundColor: 'rgba(0,0,0,0.6)',
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: 16,
+    },
+
+    modalContent: {
+      maxWidth: 600,
+      width: '100%',
+      borderRadius: 20,
+      backgroundColor: palette.card,
+      padding: 12,
+    },
+
+    modalImage: {
+      width: '100%',
+      height: 320,
+      borderRadius: 16,
+      marginBottom: 8,
+    },
+
+    modalCaption: {
+      textAlign: 'center',
+      color: palette.text,
       fontSize: 14,
     },
   });

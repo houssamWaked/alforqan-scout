@@ -11,6 +11,7 @@ import { useThemedStyles } from '../hooks/useThemedStyles';
 import { useTheme } from '../hooks/useTheme';
 import typography from '../../constants/typography';
 import TEXT from '../../constants/texts/indexText';
+import PrimaryButton from './PrimaryButton';
 
 export default function IndexComponent() {
   const router = useRouter();
@@ -58,9 +59,12 @@ export default function IndexComponent() {
           {TEXT.description}
         </Text>
 
-        <TouchableOpacity style={styles.button} onPress={handleExplore}>
-          <Text style={styles.buttonText}>{TEXT.exploreButton}</Text>
-        </TouchableOpacity>
+        <PrimaryButton
+          label={TEXT.exploreButton}
+          onPress={handleExplore}
+          style={styles.button}
+          accessibilityLabel={TEXT.exploreButton}
+        />
       </Animated.View>
     </LinearGradient>
   );

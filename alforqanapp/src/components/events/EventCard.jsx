@@ -1,9 +1,10 @@
-// components/achievements/AchievementCard.jsx
 import React, { memo, useCallback, useRef } from 'react';
 import { View, Text, Image, TouchableOpacity, Animated } from 'react-native';
 import { useRouter } from 'expo-router';
 
-function AchievementCard({ achievement, styles }) {
+import { getEventTypeLabel } from '../../constants/events';
+
+function EventCard({ event, styles }) {
   const router = useRouter();
   const scale = useRef(new Animated.Value(1)).current;
 
@@ -26,13 +27,11 @@ function AchievementCard({ achievement, styles }) {
   }, [scale]);
 
   const handlePress = useCallback(() => {
-    router.push({
-      pathname: '/achievements/[id]',
-      params: { id: String(achievement.id) },
-    });
-  }, [router, achievement.id]);
+    if (!event?.id) return;
+    router.push(`/events/${event.id}`);
+  }, [router, event?.id]);
 
-  if (!styles) return null;
+  if (!styles || !event) return null;
 
   return (
     <Animated.View style={{ transform: [{ scale }] }}>
@@ -43,34 +42,40 @@ function AchievementCard({ achievement, styles }) {
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
         accessibilityRole="button"
-        accessibilityLabel={achievement.title}
+        accessibilityLabel={event.title}
       >
-        {achievement.image && (
+        {event.image && (
           <Image
-            source={{ uri: achievement.image }}
+            source={{ uri: event.image }}
             style={styles.cardImage}
             accessible
-            accessibilityLabel={achievement.title}
+            accessibilityLabel={event.title}
           />
         )}
 
-        <View style={styles.cardHeaderRow}>
-          <View style={styles.badgeBubble}>
-            <Text style={styles.badgeText}>{achievement.badge}</Text>
+        <View style={styles.cardContent}>
+          <View style={styles.cardHeaderRow}>
+            <Text style={styles.cardTitle} numberOfLines={2}>
+              {event.title}
+            </Text>
+            <View style={styles.cardTypeBadge}>
+              <Text style={styles.cardTypeText}>
+                {getEventTypeLabel(event.type)}
+              </Text>
+            </View>
           </View>
-          <Text style={styles.yearText}>{achievement.year}</Text>
+
+          <View style={styles.cardMetaRow}>
+            <Text style={styles.cardMetaText}>
+              {event.date} A� {event.time}
+            </Text>
+            <Text style={styles.cardMetaText}>{event.location}</Text>
+          </View>
         </View>
-
-        <Text style={styles.cardTitle} numberOfLines={2}>
-          {achievement.title}
-        </Text>
-
-        <Text style={styles.cardDescription} numberOfLines={2}>
-          {achievement.description}
-        </Text>
       </TouchableOpacity>
     </Animated.View>
   );
 }
 
-export default memo(AchievementCard);
+export default memo(EventCard);
+

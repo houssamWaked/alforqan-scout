@@ -11,11 +11,14 @@ const createStyles = (palette) =>
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
-      padding: sizing.spacing.lg,
+      paddingHorizontal: sizing.spacing.lg,
+      paddingVertical: sizing.spacing.xl,
     },
     contentBox: {
       alignItems: 'center',
       justifyContent: 'center',
+      maxWidth: 520,
+      width: '100%',
     },
     logoCircle: {
       ...sizing.shadow.default,
@@ -52,16 +55,8 @@ const createStyles = (palette) =>
     },
     button: {
       ...sizing.shadow.default,
-      backgroundColor: palette.primary,
-      paddingVertical: sizing.spacing.sm,
-      paddingHorizontal: sizing.spacing.lg,
-      borderRadius: sizing.radius.md,
-      marginTop: sizing.spacing.sm,
-    },
-    buttonText: {
-      color: palette.white,
-      fontWeight: 'bold',
-      fontSize: 16,
+      alignSelf: 'stretch',
+      marginTop: sizing.spacing.md,
     },
   });
 

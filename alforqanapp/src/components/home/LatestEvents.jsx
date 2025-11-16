@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef } from 'react';
+import React, { memo, useCallback, useRef } from 'react';
 import {
   View,
   Text,
@@ -11,27 +11,27 @@ import homeStyles from '../../Styles/HomeStyleSheet';
 import { useThemedStyles } from '../../hooks/useThemedStyles';
 import { HOME_TEXT } from '../../../constants/texts/homeTexts';
 
-export default function LatestEvents({ events }) {
+function LatestEvents({ events }) {
   const styles = useThemedStyles(homeStyles);
   const scale = useRef(new Animated.Value(1)).current;
 
-  const handlePressIn = () => {
+  const handlePressIn = useCallback(() => {
     Animated.spring(scale, {
       toValue: 0.97,
       useNativeDriver: true,
       speed: 20,
       bounciness: 6,
     }).start();
-  };
+  }, [scale]);
 
-  const handlePressOut = () => {
+  const handlePressOut = useCallback(() => {
     Animated.spring(scale, {
       toValue: 1,
       useNativeDriver: true,
       speed: 20,
       bounciness: 6,
     }).start();
-  };
+  }, [scale]);
 
   const renderItem = useCallback(
     ({ item }) => (
@@ -71,3 +71,6 @@ export default function LatestEvents({ events }) {
     </View>
   );
 }
+
+export default memo(LatestEvents);
+

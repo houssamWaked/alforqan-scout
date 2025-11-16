@@ -33,6 +33,10 @@ const createStyles = (palette) =>
       marginBottom: 16,
     },
 
+    newsListContent: {
+      paddingVertical: 4,
+    },
+
     line: {
       flex: 1,
       height: 1.2,

@@ -3,7 +3,7 @@ import { Modal, View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useTheme } from '../../hooks/useTheme';
 
 export default function SettingsModal({ visible, onClose }) {
-  const { colors } = useTheme();
+  const { colors, scheme, toggleScheme, resetScheme } = useTheme();
 
   return (
     <Modal
@@ -32,9 +32,10 @@ export default function SettingsModal({ visible, onClose }) {
               activeOpacity={0.7}
               accessibilityRole="button"
               accessibilityLabel="تغيير المظهر"
+              onPress={toggleScheme}
             >
               <Text style={[styles.itemText, { color: colors.text }]}>
-                المظهر (قريبًا)
+                {scheme === 'dark' ? 'الوضع الفاتح' : 'الوضع الداكن'}
               </Text>
             </TouchableOpacity>
 

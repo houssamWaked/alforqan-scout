@@ -11,18 +11,12 @@ const createStyles = (palette) =>
       flex: 1,
     },
     container: {
-      maxWidth: 480,
+      maxWidth: 520,
       width: '100%',
       alignSelf: 'center',
-      padding: 16,
+      paddingHorizontal: 16,
+      paddingTop: 12,
       paddingBottom: 40,
-    },
-
-    pageTitle: {
-      fontSize: 20,
-      fontWeight: '700',
-      color: palette.text,
-      marginBottom: 12,
     },
 
     filtersContainer: {
@@ -149,6 +143,138 @@ const createStyles = (palette) =>
     desc: {
       fontSize: 14,
       color: palette.subText,
+    },
+
+    detailHeaderRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 16,
+    },
+    detailBackButton: {
+      width: 36,
+      height: 36,
+      borderRadius: 18,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: palette.card,
+      borderWidth: 1,
+      borderColor: palette.border,
+      marginRight: 8,
+    },
+    detailScreenTitle: {
+      fontSize: 18,
+      fontWeight: '700',
+      color: palette.text,
+      textAlign: 'right',
+      flex: 1,
+    },
+    detailHeroCard: {
+      backgroundColor: palette.card,
+      borderRadius: 20,
+      overflow: 'hidden',
+      marginBottom: 16,
+      shadowColor: '#000',
+      shadowOpacity: 0.06,
+      shadowOffset: { width: 0, height: 3 },
+      shadowRadius: 6,
+      elevation: 3,
+      position: 'relative',
+    },
+    detailImage: {
+      width: '100%',
+      height: 220,
+    },
+    detailMetaRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingHorizontal: 12,
+      paddingVertical: 10,
+    },
+    detailTitle: {
+      fontSize: 20,
+      fontWeight: '700',
+      color: palette.text,
+      marginBottom: 8,
+      textAlign: 'right',
+    },
+    detailDescription: {
+      fontSize: 14,
+      color: palette.subText,
+      lineHeight: 22,
+      textAlign: 'right',
+    },
+
+    detailCarouselTrack: {
+      flexDirection: 'row',
+    },
+    detailImageWrapper: {
+      height: 220,
+      overflow: 'hidden',
+    },
+    detailImageOverlay: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: 'rgba(0,0,0,0.15)',
+    },
+    detailImageFallback: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: palette.light.secondary,
+    },
+    detailImageFallbackText: {
+      marginTop: 6,
+      fontSize: 13,
+      color: palette.subText,
+    },
+    detailArrow: {
+      position: 'absolute',
+      top: '50%',
+      marginTop: -16,
+      width: 32,
+      height: 32,
+      borderRadius: 16,
+      backgroundColor: palette.card,
+      alignItems: 'center',
+      justifyContent: 'center',
+      shadowColor: '#000',
+      shadowOpacity: 0.12,
+      shadowOffset: { width: 0, height: 2 },
+      shadowRadius: 4,
+      elevation: 3,
+    },
+    detailArrowLeft: {
+      left: 8,
+    },
+    detailArrowRight: {
+      right: 8,
+    },
+
+    detailGalleryTitle: {
+      fontSize: 15,
+      fontWeight: '600',
+      color: palette.text,
+      marginTop: 16,
+      marginBottom: 8,
+      textAlign: 'right',
+    },
+    detailGalleryRow: {
+      flexDirection: 'row',
+      paddingBottom: 4,
+    },
+    detailThumb: {
+      width: 100,
+      height: 80,
+      borderRadius: 12,
+      marginLeft: 8,
+      overflow: 'hidden',
+      backgroundColor: palette.card,
     },
   });
 

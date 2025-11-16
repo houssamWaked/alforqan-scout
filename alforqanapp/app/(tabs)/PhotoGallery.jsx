@@ -7,6 +7,7 @@ import { useThemedStyles } from '../../src/hooks/useThemedStyles';
 import PhotoGallery from '../../src/components/PhotoGallery';
 import { useGallery } from '../../src/hooks/useGallery';
 import { GALLERY_TEXT } from '../../constants/texts/galleryTexts';
+import SectionHeader from '../../src/components/SectionHeader';
 
 export default function PhotoGalleryScreen() {
   const styles = useThemedStyles(galleryStyles);
@@ -30,7 +31,7 @@ export default function PhotoGalleryScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={refresh} />
         }
       >
-        <Text style={styles.pageTitle}>{GALLERY_TEXT.pageTitle}</Text>
+        <SectionHeader title={GALLERY_TEXT.pageTitle} />
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
         <ScrollView

@@ -1,16 +1,17 @@
-import React from 'react';
+import React, { memo } from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
   ImageBackground,
 } from 'react-native';
+import { useRouter } from 'expo-router';
 
 import aboutStyles from '../Styles/AboutUsStyleSheet';
 import { useThemedStyles } from '../hooks/useThemedStyles';
 import { useTheme } from '../hooks/useTheme';
 
-export default function AboutUsComponent({
+function AboutUsComponent({
   title,
   sections,
   timelineLabel,
@@ -22,6 +23,7 @@ export default function AboutUsComponent({
 }) {
   const styles = useThemedStyles(aboutStyles);
   const { colors } = useTheme();
+  const router = useRouter();
 
   return (
     <>
@@ -50,17 +52,33 @@ export default function AboutUsComponent({
 
       <Text style={styles.sectionLabel}>{unitsLabel}</Text>
       <View style={styles.unitGrid}>
-        {units?.map((unit) => (
-          <View key={unit.title} style={styles.unitCard}>
-            <Text style={styles.unitIcon}>{unit.icon}</Text>
-            <Text style={styles.unitTitle}>{unit.title}</Text>
-            <Text style={styles.unitAge}>{unit.age}</Text>
-            <Text style={styles.unitDesc}>{unit.description}</Text>
-            <TouchableOpacity style={styles.unitButton}>
-              <Text style={styles.unitButtonLabel}>{unitButtonLabel}</Text>
+        {units?.map((unit, index) => {
+          const divisionId =
+            index === 0 ? 'ashbal' : index === 1 ? 'scouts' : 'rovers';
+          return (
+            <TouchableOpacity
+              key={unit.title}
+              style={styles.unitCard}
+              activeOpacity={0.9}
+              accessibilityRole="button"
+              accessibilityLabel={unit.title}
+              onPress={() =>
+                router.push({
+                  pathname: '/divisions/[id]',
+                  params: { id: divisionId },
+                })
+              }
+            >
+              <Text style={styles.unitIcon}>{unit.icon}</Text>
+              <Text style={styles.unitTitle}>{unit.title}</Text>
+              <Text style={styles.unitAge}>{unit.age}</Text>
+              <Text style={styles.unitDesc}>{unit.description}</Text>
+              <View style={styles.unitButton}>
+                <Text style={styles.unitButtonLabel}>{unitButtonLabel}</Text>
+              </View>
             </TouchableOpacity>
-          </View>
-        ))}
+          );
+        })}
       </View>
 
       {hero && (
@@ -77,3 +95,5 @@ export default function AboutUsComponent({
     </>
   );
 }
+
+export default memo(AboutUsComponent);

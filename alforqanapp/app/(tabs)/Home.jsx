@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
 import PinnedAnnouncement from '../../src/components/home/PinnedAnnouncement';
+import NewsSection from '../../src/components/home/NewsSection';
 import LatestEvents from '../../src/components/home/LatestEvents';
 import QuickActions from '../../src/components/home/QuickActions';
 
@@ -53,6 +54,9 @@ export default function HomeScreen() {
           <View style={styles.line} />
           <View style={styles.line} />
         </View>
+
+        {/* NEWS SECTION */}
+        <NewsSection />
 
         {/* LATEST EVENTS */}
         <LatestEvents events={events} />

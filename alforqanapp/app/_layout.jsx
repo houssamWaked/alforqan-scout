@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { Stack } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { ThemeProvider } from '../src/context/ThemeContext';
 
 export default function RootLayout() {
   const [initialRoute, setInitialRoute] = useState(null);
@@ -28,21 +29,23 @@ export default function RootLayout() {
   if (!initialRoute) return null;
 
   return (
-    <Stack
-      initialRouteName={initialRoute}
-      screenOptions={{ headerShown: false }}
-    >
-      {/* Welcome screen */}
-      <Stack.Screen name="index" />
+    <ThemeProvider>
+      <Stack
+        initialRouteName={initialRoute}
+        screenOptions={{ headerShown: false }}
+      >
+        {/* Welcome screen */}
+        <Stack.Screen name="index" />
 
-      {/* Main app (tabs) */}
-      <Stack.Screen name="(tabs)" />
+        {/* Main app (tabs) */}
+        <Stack.Screen name="(tabs)" />
 
-      {/* Optional settings screen */}
-      <Stack.Screen
-        name="Settings"
-        options={{ title: 'Settings', headerShown: false }}
-      />
-    </Stack>
+        {/* Optional settings screen */}
+        <Stack.Screen
+          name="Settings"
+          options={{ title: 'Settings', headerShown: false }}
+        />
+      </Stack>
+    </ThemeProvider>
   );
 }

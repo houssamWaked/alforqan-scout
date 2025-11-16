@@ -13,6 +13,11 @@ const MOCK_ACHIEVEMENTS = [
     description: 'مخيم نهاية الصيف يتضمّن مسير وألعاب جماعية.',
     image:
       'https://images.unsplash.com/photo-1500534314211-0a24cd03f2c0?q=80&w=800',
+    images: [
+      'https://images.unsplash.com/photo-1500534314211-0a24cd03f2c0?q=80&w=800',
+      'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=800',
+      'https://images.unsplash.com/photo-1523419409543-3e4f83b9b4c9?q=80&w=800',
+    ],
   },
   {
     id: 2,
@@ -23,6 +28,11 @@ const MOCK_ACHIEVEMENTS = [
     description: 'شاركت الفرقة في تحدّي المنطقة وقدّمت أداء مميّز.',
     image:
       'https://images.unsplash.com/photo-1526498460520-4c246339dccb?q=80&w=800',
+    images: [
+      'https://images.unsplash.com/photo-1526498460520-4c246339dccb?q=80&w=800',
+      'https://images.unsplash.com/photo-1489515217757-5fd1be406fef?q=80&w=800',
+      'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?q=80&w=800',
+    ],
   },
   {
     id: 3,
@@ -33,6 +43,11 @@ const MOCK_ACHIEVEMENTS = [
     description: 'يوم تطوّعي لدعم الحيّ المحلي والنشاطات المجتمعية.',
     image:
       'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=800',
+    images: [
+      'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=800',
+      'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=800',
+      'https://images.unsplash.com/photo-1488520542877-8ee5e48551fb?q=80&w=800',
+    ],
   },
 ];
 

@@ -1,11 +1,12 @@
-import React from 'react';
-import { View, Text, TextInput, TouchableOpacity } from 'react-native';
+import React, { memo } from 'react';
+import { View, Text, TextInput, Pressable } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
 import contactStyles from '../Styles/ContactUsStyleSheet';
 import { useThemedStyles } from '../hooks/useThemedStyles';
 import { useTheme } from '../hooks/useTheme';
 import { CONTACT_TEXT } from '../../constants/texts/contactTexts';
+import PrimaryButton from './PrimaryButton';
 
 const SOCIAL_ITEMS = [
   { id: 'whatsapp', icon: 'logo-whatsapp' },
@@ -13,7 +14,7 @@ const SOCIAL_ITEMS = [
   { id: 'youtube', icon: 'logo-youtube' },
 ];
 
-export default function ContactUsComponent({
+function ContactUsComponent({
   name,
   email,
   message,
@@ -28,11 +29,6 @@ export default function ContactUsComponent({
   const styles = useThemedStyles(contactStyles);
   const { colors } = useTheme();
 
-  const buttonStyle = [
-    styles.submitButton,
-    submitting && styles.submitButtonDisabled,
-  ];
-
   return (
     <View>
       <Text style={styles.pageTitle}>{CONTACT_TEXT.pageTitle}</Text>
@@ -45,8 +41,12 @@ export default function ContactUsComponent({
           <TextInput
             style={styles.input}
             placeholder={CONTACT_TEXT.namePlaceholder}
+            placeholderTextColor={colors.subText}
             value={name}
             onChangeText={onChangeName}
+            autoCorrect={false}
+            textContentType="name"
+            accessibilityLabel={CONTACT_TEXT.nameLabel}
           />
         </View>
 
@@ -57,8 +57,12 @@ export default function ContactUsComponent({
             placeholder={CONTACT_TEXT.emailPlaceholder}
             keyboardType="email-address"
             autoCapitalize="none"
+            autoCorrect={false}
+            textContentType="emailAddress"
             value={email}
             onChangeText={onChangeEmail}
+            placeholderTextColor={colors.subText}
+            accessibilityLabel={CONTACT_TEXT.emailLabel}
           />
         </View>
 
@@ -70,6 +74,8 @@ export default function ContactUsComponent({
             multiline
             value={message}
             onChangeText={onChangeMessage}
+            placeholderTextColor={colors.subText}
+            accessibilityLabel={CONTACT_TEXT.messageLabel}
           />
         </View>
 
@@ -80,32 +86,35 @@ export default function ContactUsComponent({
           <Text style={[styles.statusText, styles.successText]}>{success}</Text>
         ) : null}
 
-        <TouchableOpacity
-          style={buttonStyle}
+        <PrimaryButton
+          label={
+            submitting
+              ? CONTACT_TEXT.submittingLabel
+              : CONTACT_TEXT.submitLabel
+          }
           onPress={onSubmit}
           disabled={submitting}
-        >
-          <Text style={styles.submitButtonText}>
-            {submitting ? CONTACT_TEXT.submittingLabel : CONTACT_TEXT.submitLabel}
-          </Text>
-        </TouchableOpacity>
+          style={styles.submitButton}
+          accessibilityLabel={CONTACT_TEXT.submitLabel}
+        />
       </View>
 
       <View style={styles.socialCard}>
         <Text style={styles.socialTitle}>{CONTACT_TEXT.socialTitle}</Text>
         <View style={styles.socialRow}>
           {SOCIAL_ITEMS.map((item) => (
-            <TouchableOpacity
+            <Pressable
               key={item.id}
-              style={styles.socialIconButton}
-              activeOpacity={0.8}
+              style={({ pressed }) => [
+                styles.socialIconButton,
+                pressed && { transform: [{ scale: 0.95 }] },
+              ]}
+              onPress={() => {}}
+              accessibilityRole="button"
+              accessibilityLabel={item.id}
             >
-              <Ionicons
-                name={item.icon}
-                size={22}
-                color={colors.primary}
-              />
-            </TouchableOpacity>
+              <Ionicons name={item.icon} size={22} color={colors.primary} />
+            </Pressable>
           ))}
         </View>
       </View>
@@ -113,3 +122,4 @@ export default function ContactUsComponent({
   );
 }
 
+export default memo(ContactUsComponent);
