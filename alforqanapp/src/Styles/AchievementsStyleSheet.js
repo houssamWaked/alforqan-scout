@@ -1,0 +1,293 @@
+import { StyleSheet } from 'react-native';
+import { COLOR_SCHEMES } from '../../constants/colors';
+
+const createStyles = (palette) =>
+  StyleSheet.create({
+    safeArea: {
+      flex: 1,
+      backgroundColor: palette.background,
+    },
+    scroll: {
+      flex: 1,
+    },
+    container: {
+      maxWidth: 540,
+      width: '100%',
+      alignSelf: 'center',
+      paddingHorizontal: 16,
+      paddingTop: 12,
+      paddingBottom: 40,
+    },
+    heroSection: {
+      marginBottom: 12,
+    },
+    heroTitle: {
+      fontSize: 22,
+      fontWeight: '700',
+      color: palette.text,
+      textAlign: 'right',
+    },
+    heroSubtitle: {
+      fontSize: 13,
+      color: palette.subText,
+      textAlign: 'right',
+      lineHeight: 20,
+      marginTop: 4,
+    },
+    filtersContainer: {
+      flexDirection: 'row',
+      marginBottom: 12,
+    },
+    filtersRow: {
+      flexDirection: 'row',
+    },
+    filterChip: {
+      paddingVertical: 6,
+      paddingHorizontal: 14,
+      borderRadius: 20,
+      borderWidth: 1,
+      borderColor: palette.border,
+      marginLeft: 8,
+      backgroundColor: palette.card,
+    },
+    filterChipActive: {
+      backgroundColor: palette.primary,
+      borderColor: palette.primary,
+    },
+    filterText: {
+      fontSize: 13,
+      color: palette.subText,
+    },
+    filterTextActive: {
+      color: palette.white,
+      fontWeight: '600',
+    },
+    gridWrapper: {},
+    gridContent: {
+      paddingBottom: 20,
+    },
+    card: {
+      backgroundColor: palette.card,
+      borderRadius: 16,
+      padding: 10,
+      marginBottom: 12,
+      shadowColor: '#000',
+      shadowOpacity: 0.06,
+      shadowOffset: { width: 0, height: 3 },
+      shadowRadius: 6,
+      elevation: 3,
+    },
+    cardPressed: {
+      transform: [{ scale: 0.97 }],
+      opacity: 0.95,
+    },
+    cardImage: {
+      width: '100%',
+      height: 130,
+      borderRadius: 14,
+      marginBottom: 8,
+    },
+    cardHeaderRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 4,
+    },
+    badgeBubble: {
+      backgroundColor: palette.light.secondary,
+      borderRadius: 999,
+      paddingVertical: 4,
+      paddingHorizontal: 10,
+    },
+    badgeText: {
+      fontSize: 13,
+      color: palette.text,
+    },
+    yearText: {
+      fontSize: 12,
+      color: palette.subText,
+    },
+    cardTitle: {
+      fontSize: 15,
+      fontWeight: '600',
+      color: palette.text,
+      marginBottom: 4,
+    },
+    cardDescription: {
+      fontSize: 12,
+      color: palette.subText,
+      lineHeight: 18,
+    },
+    emptyWrapper: {
+      paddingVertical: 28,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    emptyText: {
+      fontSize: 14,
+      color: palette.subText,
+      textAlign: 'center',
+      lineHeight: 20,
+    },
+    errorText: {
+      color: palette.danger,
+      textAlign: 'center',
+      fontSize: 14,
+      marginVertical: 8,
+    },
+    loadingWrapper: {
+      paddingVertical: 24,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    // Detail
+    headerRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      marginBottom: 12,
+    },
+    backButton: {
+      width: 38,
+      height: 38,
+      borderRadius: 19,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: palette.card,
+      borderWidth: 1,
+      borderColor: palette.border,
+      shadowColor: '#000',
+      shadowOpacity: 0.08,
+      shadowOffset: { width: 0, height: 2 },
+      shadowRadius: 4,
+      elevation: 3,
+    },
+    headerTitle: {
+      flex: 1,
+      textAlign: 'center',
+      fontSize: 18,
+      fontWeight: '700',
+      color: palette.text,
+      marginHorizontal: 12,
+    },
+    headerSpacer: {
+      width: 38,
+    },
+    heroCard: {
+      borderRadius: 20,
+      overflow: 'hidden',
+      backgroundColor: palette.card,
+      shadowColor: '#000',
+      shadowOpacity: 0.08,
+      shadowOffset: { width: 0, height: 3 },
+      shadowRadius: 8,
+      elevation: 4,
+      marginBottom: 12,
+    },
+    heroImage: {
+      width: '100%',
+      height: 240,
+    },
+    heroFallback: {
+      height: 240,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: palette.light.secondary,
+    },
+    heroOverlay: {
+      position: 'absolute',
+      left: 0,
+      right: 0,
+      bottom: 0,
+      paddingHorizontal: 14,
+      paddingVertical: 10,
+    },
+    heroDetailTitle: {
+      color: palette.white,
+      fontSize: 18,
+      fontWeight: '700',
+      textAlign: 'right',
+    },
+    heroMetaRow: {
+      flexDirection: 'row',
+      justifyContent: 'flex-end',
+      marginTop: 6,
+      gap: 8,
+      flexWrap: 'wrap',
+    },
+    heroMetaText: {
+      color: 'rgba(255,255,255,0.9)',
+      fontSize: 12,
+      textAlign: 'right',
+    },
+    heroControls: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingVertical: 10,
+      gap: 12,
+      backgroundColor: palette.card,
+    },
+    heroControlButton: {
+      width: 36,
+      height: 36,
+      borderRadius: 18,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: palette.card,
+      borderWidth: 1,
+      borderColor: palette.border,
+      shadowColor: '#000',
+      shadowOpacity: 0.08,
+      shadowOffset: { width: 0, height: 2 },
+      shadowRadius: 4,
+      elevation: 3,
+    },
+    heroControlDisabled: {
+      opacity: 0.4,
+    },
+    heroCounter: {
+      color: palette.text,
+      fontWeight: '600',
+      fontSize: 13,
+    },
+    metaRow: {
+      flexDirection: 'row',
+      justifyContent: 'flex-start',
+      gap: 12,
+      marginBottom: 10,
+    },
+    metaBadge: {
+      backgroundColor: palette.light.secondary,
+      borderRadius: 999,
+      paddingVertical: 6,
+      paddingHorizontal: 12,
+    },
+    metaBadgeText: {
+      color: palette.text,
+      fontWeight: '600',
+      fontSize: 13,
+    },
+    metaYear: {
+      color: palette.subText,
+      fontSize: 13,
+    },
+    sectionTitle: {
+      fontSize: 18,
+      fontWeight: '700',
+      color: palette.text,
+      marginBottom: 8,
+      textAlign: 'right',
+    },
+    bodyText: {
+      fontSize: 14,
+      color: palette.text,
+      lineHeight: 22,
+      textAlign: 'right',
+    },
+  });
+
+export default {
+  light: createStyles(COLOR_SCHEMES.light),
+  dark: createStyles(COLOR_SCHEMES.dark),
+};

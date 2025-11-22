@@ -1,28 +1,27 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import {
-  Alert,
-  ScrollView,
-  View,
-  Text,
-  Image,
-  TouchableOpacity,
-} from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import Ionicons from '@expo/vector-icons/Ionicons';
+import { ScrollView, RefreshControl, Alert } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 
 import eventsStyles from '../../src/Styles/EventsStyleSheet';
 import { useThemedStyles } from '../../src/hooks/useThemedStyles';
 import { useTheme } from '../../src/hooks/useTheme';
-import {
-  getEventById,
-  getEventTypeLabel,
-  isUpcomingEvent,
-} from '../../src/constants/events';
-import PrimaryButton from '../../src/components/PrimaryButton';
+import { useEventDetail } from '../../src/hooks/useEventDetail';
+import { isUpcomingEvent } from '../../src/constants/events';
+import { EVENTS_TEXT } from '../../constants/texts/eventsTexts';
 import EventRegisterModal from '../../src/components/events/EventRegisterModal';
 import { useEventRegistration } from '../../src/hooks/useEventRegistration';
+
+import EventHeader from '../../src/components/events/EventHeader';
+import EventHero from '../../src/components/events/EventHero';
+import EventInfo from '../../src/components/events/EventInfo';
+import EventDescription from '../../src/components/events/EventDescription';
+import EventProgram from '../../src/components/events/EventProgram';
+import EventEquipment from '../../src/components/events/EventEquipment';
+import EventCTA from '../../src/components/events/EventCTA';
+import EventLoading from '../../src/components/events/EventLoading';
+import EventErrorState from '../../src/components/events/EventErrorState';
+import EventEmptyState from '../../src/components/events/EventEmptyState';
 
 export default function EventDetailScreen() {
   const { id } = useLocalSearchParams();
@@ -30,7 +29,8 @@ export default function EventDetailScreen() {
   const styles = useThemedStyles(eventsStyles);
   const { colors } = useTheme();
 
-  const event = useMemo(() => getEventById(id), [id]);
+  const { data, loading, error, refresh, refreshing } = useEventDetail(id);
+  const event = data?.event;
 
   const {
     visible,
@@ -52,19 +52,22 @@ export default function EventDetailScreen() {
     handleSubmit,
   } = useEventRegistration();
 
+  const handleBack = useCallback(() => {
+    router.back();
+  }, [router]);
+
   const handleOpenRegistration = useCallback(() => {
     if (!event?.date) return;
 
     if (!isUpcomingEvent(event.date)) {
-      Alert.alert(
-        'تم إغلاق التسجيل',
-        'لا يمكن التسجيل في هذا النشاط لأنه قد انتهى بالفعل.'
-      );
+      Alert.alert(EVENTS_TEXT.notUpcomingTitle, EVENTS_TEXT.notUpcomingMessage);
       return;
     }
 
     open();
-  }, [event, open]);
+  }, [event?.date, open]);
+
+  const hasEvent = !!event;
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -72,189 +75,58 @@ export default function EventDetailScreen() {
         style={styles.scroll}
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={!!refreshing}
+            onRefresh={refresh}
+            tintColor={colors.primary}
+          />
+        }
       >
-        {/* Header */}
-        <View style={styles.detailHeaderRow}>
-          <View style={{ flex: 1 }} />
-          <Text style={styles.detailScreenTitle}>
-            {event?.title || 'تفاصيل النشاط'}
-          </Text>
-
-          <TouchableOpacity
-            onPress={() => router.back()}
-            style={styles.detailBackButton}
-            accessibilityRole="button"
-            accessibilityLabel="رجوع"
-          >
-            <Ionicons name="chevron-back" size={22} color={colors.text} />
-          </TouchableOpacity>
-        </View>
-
-        {event ? (
-          <>
-            {/* HERO IMAGE */}
-            <View style={styles.heroCard}>
-              {event.image ? (
-                <View>
-                  <Image
-                    source={{ uri: event.image }}
-                    style={styles.heroImage}
-                  />
-
-                  <LinearGradient
-                    colors={['transparent', 'rgba(0,0,0,0.7)']}
-                    style={styles.heroOverlay}
-                  >
-                    <View style={styles.heroTitleRow}>
-                      <Text style={styles.detailTitle} numberOfLines={2}>
-                        {event.title}
-                      </Text>
-
-                      <View style={styles.detailTypeBadge}>
-                        <Text style={styles.detailTypeText}>
-                          {getEventTypeLabel(event.type)}
-                        </Text>
-                      </View>
-                    </View>
-
-                    <View style={styles.heroMetaRow}>
-                      <Text style={styles.heroMetaText}>
-                        {event.date} • {event.time}
-                      </Text>
-                      <Text style={styles.heroMetaText}>{event.location}</Text>
-                    </View>
-                  </LinearGradient>
-                </View>
-              ) : (
-                <View
-                  style={[
-                    styles.heroImage,
-                    {
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      backgroundColor: colors.light?.secondary || colors.card,
-                    },
-                  ]}
-                >
-                  <Ionicons
-                    name="calendar-outline"
-                    size={32}
-                    color={colors.subText}
-                  />
-                  <Text style={{ color: colors.subText, marginTop: 6 }}>
-                    {event.title}
-                  </Text>
-                </View>
-              )}
-            </View>
-
-            {/* INFO SECTION */}
-            <View style={styles.infoSection}>
-              <View style={styles.infoRow}>
-                <Text style={styles.infoLabel}>التاريخ</Text>
-                <Text style={styles.infoValue}>{event.date}</Text>
-              </View>
-
-              <View style={styles.infoRow}>
-                <Text style={styles.infoLabel}>الوقت</Text>
-                <Text style={styles.infoValue}>{event.time}</Text>
-              </View>
-
-              <View style={styles.infoRow}>
-                <Text style={styles.infoLabel}>الموقع</Text>
-                <Text style={styles.infoValue}>{event.location}</Text>
-              </View>
-
-              {event.leader ? (
-                <View style={styles.infoRow}>
-                  <Text style={styles.infoLabel}>القائد المسؤول</Text>
-                  <Text style={styles.infoValue}>{event.leader}</Text>
-                </View>
-              ) : null}
-            </View>
-
-            {/* DESCRIPTION */}
-            {event.description ? (
-              <>
-                <Text style={styles.sectionTitle}>وصف النشاط</Text>
-                <Text style={styles.descriptionText}>{event.description}</Text>
-              </>
-            ) : null}
-
-            {/* PROGRAM */}
-            {event.program && event.program.length > 0 && (
-              <View style={{ marginBottom: 16 }}>
-                <Text style={styles.sectionTitle}>برنامج النشاط</Text>
-
-                <View>
-                  {event.program.map((item, index) => (
-                    <View
-                      key={`${item.time}-${index}`}
-                      style={styles.programItem}
-                    >
-                      <View style={styles.programTimeColumn}>
-                        <Text style={styles.programTime}>{item.time}</Text>
-                      </View>
-
-                      <View style={styles.programContent}>
-                        <Text style={styles.programTitle}>{item.title}</Text>
-                      </View>
-                    </View>
-                  ))}
-                </View>
-              </View>
-            )}
-
-            {/* EQUIPMENT */}
-            {event.equipment && event.equipment.length > 0 && (
-              <View>
-                <Text style={styles.sectionTitle}>التجهيزات المطلوبة</Text>
-
-                <View style={styles.equipmentChipRow}>
-                  {event.equipment.map((item, index) => (
-                    <View key={`${item}-${index}`} style={styles.equipmentChip}>
-                      <Text style={styles.equipmentChipText}>{item}</Text>
-                    </View>
-                  ))}
-                </View>
-              </View>
-            )}
-
-            {/* CTA */}
-            <View style={styles.ctaWrapper}>
-              <PrimaryButton
-                label="التسجيل في هذا النشاط"
-                onPress={handleOpenRegistration}
-              />
-            </View>
-          </>
-        ) : (
-          <View style={styles.emptyStateWrapper}>
-            <Text style={styles.emptyStateText}>
-              تعذّر تحميل تفاصيل النشاط. يرجى التحقق من الاتصال وإعادة المحاولة.
-            </Text>
-          </View>
-        )}
-
-        <EventRegisterModal
-          visible={visible}
-          onClose={close}
-          name={name}
-          nationality={nationality}
-          residence={residence}
-          participationChoice={participationChoice}
-          scoutStatus={scoutStatus}
-          notes={notes}
-          submitting={submitting}
-          onChangeName={setName}
-          onChangeNationality={setNationality}
-          onChangeResidence={setResidence}
-          onChangeParticipation={setParticipationChoice}
-          onChangeScoutStatus={setScoutStatus}
-          onChangeNotes={setNotes}
-          onSubmit={handleSubmit}
+        <EventHeader
+          title={event?.title || EVENTS_TEXT.detailTitleFallback}
+          onBack={handleBack}
         />
+
+        {loading ? (
+          <EventLoading />
+        ) : error ? (
+          <EventErrorState message={error} />
+        ) : !hasEvent ? (
+          <EventEmptyState />
+        ) : (
+          <>
+            <EventHero event={event} />
+            <EventInfo event={event} />
+            <EventDescription description={event.description} />
+            <EventProgram program={event.program} />
+            <EventEquipment equipment={event.equipment} />
+            <EventCTA
+              label={EVENTS_TEXT.ctaLabel}
+              onPress={handleOpenRegistration}
+            />
+          </>
+        )}
       </ScrollView>
+
+      <EventRegisterModal
+        visible={visible}
+        onClose={close}
+        name={name}
+        nationality={nationality}
+        residence={residence}
+        participationChoice={participationChoice}
+        scoutStatus={scoutStatus}
+        notes={notes}
+        submitting={submitting}
+        onChangeName={setName}
+        onChangeNationality={setNationality}
+        onChangeResidence={setResidence}
+        onChangeParticipation={setParticipationChoice}
+        onChangeScoutStatus={setScoutStatus}
+        onChangeNotes={setNotes}
+        onSubmit={handleSubmit}
+      />
     </SafeAreaView>
   );
 }

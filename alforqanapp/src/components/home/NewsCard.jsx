@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { memo, useCallback, useMemo } from 'react';
 import { Text, Image, Pressable } from 'react-native';
 
 import homeStyles from '../../Styles/HomeStyleSheet';
@@ -8,23 +8,30 @@ function NewsCard({ item, onPress }) {
   const styles = useThemedStyles(homeStyles);
   const { title, date, image } = item;
 
-  const handlePress = () => {
+  const imageSource = useMemo(() => {
+    if (!image) return null;
+    return typeof image === 'string' ? { uri: image } : image;
+  }, [image]);
+
+  const handlePress = useCallback(() => {
     if (typeof onPress === 'function') {
-      onPress();
+      onPress(item);
     }
-  };
+  }, [item, onPress]);
 
   return (
     <Pressable
       onPress={handlePress}
       style={({ pressed }) => [
         styles.eventCard,
-        pressed && { transform: [{ scale: 0.97 }], opacity: 0.95 },
+        pressed && styles.eventCardPressed,
       ]}
       accessibilityRole="button"
       accessibilityLabel={title}
     >
-      <Image source={image} style={styles.eventImage} />
+      {imageSource && (
+        <Image source={imageSource} style={styles.eventImage} />
+      )}
       <Text style={styles.eventTitle} numberOfLines={2}>
         {title}
       </Text>

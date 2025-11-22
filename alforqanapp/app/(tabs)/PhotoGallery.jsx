@@ -1,16 +1,23 @@
+// app/(tabs)/PhotoGallery.jsx
 import React from 'react';
-import { ScrollView, Text, RefreshControl, TouchableOpacity } from 'react-native';
+import { ScrollView, Text, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import galleryStyles from '../../src/Styles/PhotoGallery';
 import { useThemedStyles } from '../../src/hooks/useThemedStyles';
-import PhotoGallery from '../../src/components/PhotoGallery';
 import { useGallery } from '../../src/hooks/useGallery';
-import { GALLERY_TEXT } from '../../constants/texts/galleryTexts';
+
 import SectionHeader from '../../src/components/SectionHeader';
+import PhotoGrid from '../../src/components/gallery/PhotoGrid';
+import FilterChip from '../../src/components/gallery/FilterChip';
+
+import { GALLERY_TEXT } from '../../constants/texts/galleryTexts';
+import { useTheme } from '../../src/hooks/useTheme';
 
 export default function PhotoGalleryScreen() {
   const styles = useThemedStyles(galleryStyles);
+  const { colors } = useTheme();
+
   const {
     filteredImages,
     loading,
@@ -22,45 +29,48 @@ export default function PhotoGalleryScreen() {
     setActiveFilter,
   } = useGallery();
 
+  const isEmpty = !loading && filteredImages.length === 0;
+
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView edges={['top']} style={styles.safeArea}>
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.container}
+        keyboardShouldPersistTaps="handled"
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={refresh} />
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={refresh}
+            tintColor={colors.primary}
+          />
         }
       >
         <SectionHeader title={GALLERY_TEXT.pageTitle} />
-        {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
+        {error && <Text style={styles.errorText}>{error}</Text>}
+
+        {/* FILTERS */}
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.filtersContainer}
         >
-          {filters.map((filter) => {
-            const isActive = activeFilter === filter.id;
-            return (
-              <TouchableOpacity
-                key={filter.id}
-                style={[
-                  styles.filterChip,
-                  isActive && styles.filterChipActive,
-                ]}
-                onPress={() => setActiveFilter(filter.id)}
-              >
-                <Text
-                  style={[styles.filterText, isActive && styles.filterTextActive]}
-                >
-                  {filter.label}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
+          {filters.map((filter) => (
+            <FilterChip
+              key={filter.id}
+              label={filter.label}
+              active={activeFilter === filter.id}
+              onPress={() => setActiveFilter(filter.id)}
+            />
+          ))}
         </ScrollView>
 
-        <PhotoGallery images={filteredImages} loading={loading} />
+        {/* EMPTY STATE */}
+        {isEmpty ? (
+          <Text style={styles.emptyText}>{GALLERY_TEXT.emptyText}</Text>
+        ) : (
+          <PhotoGrid images={filteredImages} loading={loading} />
+        )}
       </ScrollView>
     </SafeAreaView>
   );

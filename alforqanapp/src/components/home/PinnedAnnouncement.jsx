@@ -1,3 +1,4 @@
+// src/components/home/PinnedAnnouncement.jsx
 import React, { memo } from 'react';
 import { View, Text } from 'react-native';
 import { HOME_TEXT } from '../../../constants/texts/homeTexts';
@@ -6,6 +7,7 @@ import { useThemedStyles } from '../../hooks/useThemedStyles';
 
 function PinnedAnnouncement({ announcement }) {
   const styles = useThemedStyles(homeStyles);
+
   return (
     <View style={styles.pinnedBox}>
       <Text style={styles.pinnedTitle}>{HOME_TEXT.pinnedTitle}</Text>
@@ -15,5 +17,7 @@ function PinnedAnnouncement({ announcement }) {
     </View>
   );
 }
+
+PinnedAnnouncement.displayName = 'PinnedAnnouncement';
 
 export default memo(PinnedAnnouncement);

@@ -1,9 +1,7 @@
+// useTheme.js
 import { useColorScheme } from 'react-native';
 import { useContext } from 'react';
-import {
-  COLOR_SCHEMES,
-  DEFAULT_COLOR_SCHEME,
-} from '../../constants/colors';
+import { COLOR_SCHEMES, DEFAULT_COLOR_SCHEME } from '../../constants/colors';
 import { ThemeContext } from '../context/ThemeContext';
 
 export function useTheme() {

@@ -1,33 +1,49 @@
-import { useEffect, useState } from 'react';
+// src/hooks/useAnnouncements.js
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { HOME_TEXT } from '../../constants/texts/homeTexts';
 import { getPinnedAnnouncement } from '../services/announcementService';
 
 export function useAnnouncements() {
-  const [announcement, setAnnouncement] = useState(
-    HOME_TEXT.fallbackAnnounce
-  );
+  const isMounted = useRef(true);
 
-  useEffect(() => {
-    let isMounted = true;
+  const [data, setData] = useState(HOME_TEXT.fallbackAnnounce);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-    const loadAnnouncement = async () => {
-      try {
-        const text = await getPinnedAnnouncement();
-        if (isMounted && text) {
-          setAnnouncement(text);
-        }
-      } catch (error) {
-        // Log and keep showing the local fallback text.
-        console.error('useAnnouncements error:', error);
+  const load = useCallback(async () => {
+    setLoading(true);
+    try {
+      const text = await getPinnedAnnouncement();
+      if (!isMounted.current) return;
+      if (text) {
+        setData(text);
       }
-    };
-
-    loadAnnouncement();
-
-    return () => {
-      isMounted = false;
-    };
+      setError(null);
+    } catch (err) {
+      if (isMounted.current) {
+        // keep fallback text, just flag error
+        setError(err || true);
+      }
+    } finally {
+      if (isMounted.current) {
+        setLoading(false);
+      }
+    }
   }, []);
 
-  return announcement;
+  useEffect(() => {
+    load();
+    return () => {
+      isMounted.current = false;
+    };
+  }, [load]);
+
+  return {
+    data,
+    loading,
+    error,
+    refresh: load,
+  };
 }
+
+export default useAnnouncements;

@@ -1,16 +1,26 @@
-/**
- * Mock contact service.
- *
- * In the future this can post to a backend or Supabase function.
- * For now it simply resolves successfully so the UI flow can be wired.
- */
+import { supabase } from '../lib/supabase';
+
 export async function sendContactMessage({ name, email, message, reason }) {
   if (!name || !email || !message) {
     throw new Error('Missing contact fields');
   }
 
-  // TODO: Replace with real network call.
-  // `reason` is currently unused but accepted to support the new multi-step flow.
+  const fullMessage =
+    reason && reason.trim().length > 0
+      ? `[Reason] ${reason}\n\n${message}`
+      : message;
+
+  const { error } = await supabase.from('contact_messages').insert({
+    name,
+    email,
+    message: fullMessage,
+  });
+
+  if (error) {
+    console.error('sendContactMessage error:', error);
+    throw error;
+  }
+
   return true;
 }
 

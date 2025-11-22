@@ -1,5 +1,6 @@
-import React, { useCallback } from 'react';
-import { View, Text, TouchableOpacity, Image, Pressable } from 'react-native';
+// src/components/home/QuickActions.jsx
+import React from 'react';
+import { View, Text, Image, Pressable } from 'react-native';
 import { QUICK_ACTIONS } from '../../../constants/texts/quickActions';
 import { useRouter } from 'expo-router';
 import homeStyles from '../../Styles/HomeStyleSheet';
@@ -16,7 +17,7 @@ export default function QuickActions() {
           key={action.id}
           style={({ pressed }) => [
             styles.actionButton,
-            pressed && { transform: [{ scale: 0.97 }] },
+            pressed && styles.actionButtonPressed,
           ]}
           onPress={() => router.push(action.route)}
           android_ripple={{ color: 'rgba(0,0,0,0.06)', borderless: false }}

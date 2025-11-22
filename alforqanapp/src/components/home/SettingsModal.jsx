@@ -1,9 +1,13 @@
+// src/components/home/SettingsModal.jsx
 import React from 'react';
-import { Modal, View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { Modal, View, Text, TouchableOpacity } from 'react-native';
 import { useTheme } from '../../hooks/useTheme';
+import { useThemedStyles } from '../../hooks/useThemedStyles';
+import homeStyles from '../../Styles/HomeStyleSheet';
 
 export default function SettingsModal({ visible, onClose }) {
-  const { colors, scheme, toggleScheme, resetScheme } = useTheme();
+  const { scheme, toggleScheme } = useTheme();
+  const styles = useThemedStyles(homeStyles);
 
   return (
     <Modal
@@ -12,113 +16,51 @@ export default function SettingsModal({ visible, onClose }) {
       transparent
       onRequestClose={onClose}
     >
-      <View style={styles.backdrop}>
-        <View
-          style={[
-            styles.container,
-            {
-              backgroundColor: colors.card,
-              borderColor: colors.border,
-            },
-          ]}
-        >
-          <Text style={[styles.title, { color: colors.text }]}>
-            الإعدادات
-          </Text>
+      <View style={styles.settingsModalBackdrop}>
+        <View style={styles.settingsModalContainer}>
+          <Text style={styles.settingsModalTitle}>الإعدادات</Text>
 
-          <View style={styles.items}>
+          <View style={styles.settingsModalItems}>
             <TouchableOpacity
-              style={styles.item}
+              style={styles.settingsModalItem}
               activeOpacity={0.7}
               accessibilityRole="button"
               accessibilityLabel="تغيير المظهر"
               onPress={toggleScheme}
             >
-              <Text style={[styles.itemText, { color: colors.text }]}>
+              <Text style={styles.settingsModalItemText}>
                 {scheme === 'dark' ? 'الوضع الفاتح' : 'الوضع الداكن'}
               </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={styles.item}
+              style={styles.settingsModalItem}
               activeOpacity={0.7}
               accessibilityRole="button"
               accessibilityLabel="عن التطبيق"
             >
-              <Text style={[styles.itemText, { color: colors.text }]}>
-                عن التطبيق
-              </Text>
+              <Text style={styles.settingsModalItemText}>عن التطبيق</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={styles.item}
+              style={styles.settingsModalItem}
               activeOpacity={0.7}
               accessibilityRole="button"
               accessibilityLabel="الشروط والأحكام"
             >
-              <Text style={[styles.itemText, { color: colors.text }]}>
-                الشروط والأحكام
-              </Text>
+              <Text style={styles.settingsModalItemText}>الشروط والأحكام</Text>
             </TouchableOpacity>
           </View>
 
           <TouchableOpacity
-            style={[styles.closeButton, { borderColor: colors.border }]}
+            style={styles.settingsModalCloseButton}
             onPress={onClose}
             activeOpacity={0.8}
           >
-            <Text style={[styles.closeText, { color: colors.primary }]}>
-              إغلاق
-            </Text>
+            <Text style={styles.settingsModalCloseText}>إغلاق</Text>
           </TouchableOpacity>
         </View>
       </View>
     </Modal>
   );
 }
-
-const styles = StyleSheet.create({
-  backdrop: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.35)',
-    justifyContent: 'flex-end',
-  },
-  container: {
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 24,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    borderWidth: 1,
-    width: '100%',
-    maxWidth: 520,
-    alignSelf: 'center',
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: '700',
-    textAlign: 'right',
-    marginBottom: 12,
-  },
-  items: {
-    marginTop: 8,
-  },
-  item: {
-    paddingVertical: 12,
-  },
-  itemText: {
-    fontSize: 15,
-    textAlign: 'right',
-  },
-  closeButton: {
-    marginTop: 16,
-    paddingVertical: 10,
-    borderRadius: 12,
-    borderWidth: 1,
-    alignItems: 'center',
-  },
-  closeText: {
-    fontSize: 15,
-    fontWeight: '600',
-  },
-});

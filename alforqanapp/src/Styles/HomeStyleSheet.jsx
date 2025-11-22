@@ -1,3 +1,4 @@
+// HomeStyleSheet.jsx
 import { StyleSheet } from 'react-native';
 import { COLOR_SCHEMES } from '../../constants/colors';
 import sizing from '../../constants/sizing';
@@ -8,11 +9,9 @@ const createStyles = (palette) =>
       flex: 1,
       backgroundColor: palette.background,
     },
-
     scroll: {
       flex: 1,
     },
-
     container: {
       maxWidth: 520,
       width: '100%',
@@ -21,22 +20,18 @@ const createStyles = (palette) =>
       paddingTop: 12,
       paddingBottom: 40,
     },
-
     sectionHeader: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       marginBottom: 12,
       marginTop: 16,
     },
-
     sectionContainer: {
       marginBottom: 16,
     },
-
     newsListContent: {
       paddingVertical: 4,
     },
-
     line: {
       flex: 1,
       height: 1.2,
@@ -44,7 +39,16 @@ const createStyles = (palette) =>
       marginHorizontal: 4,
       borderRadius: 10,
     },
-
+    errorText: {
+      textAlign: 'center',
+      color: palette.danger,
+      marginVertical: 8,
+      fontSize: 14,
+    },
+    loadingInline: {
+      alignItems: 'center',
+      marginVertical: 8,
+    },
     pinnedBox: {
       backgroundColor: palette.card,
       padding: 16,
@@ -71,7 +75,6 @@ const createStyles = (palette) =>
       lineHeight: 22,
       textAlign: 'right',
     },
-
     eventCard: {
       width: 180,
       backgroundColor: palette.card,
@@ -84,14 +87,16 @@ const createStyles = (palette) =>
       shadowRadius: 6,
       elevation: 3,
     },
-
+    eventCardPressed: {
+      transform: [{ scale: 0.97 }],
+      opacity: 0.95,
+    },
     eventImage: {
       width: '100%',
       height: 100,
       borderRadius: 12,
       marginBottom: 8,
     },
-
     eventTitle: {
       fontSize: 14,
       fontWeight: '600',
@@ -99,19 +104,16 @@ const createStyles = (palette) =>
       marginBottom: 4,
       textAlign: 'right',
     },
-
     eventDate: {
       fontSize: 12,
       color: palette.subText,
       textAlign: 'right',
     },
-
     actionsContainer: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       marginTop: 18,
     },
-
     actionButton: {
       flex: 1,
       backgroundColor: palette.card,
@@ -123,14 +125,15 @@ const createStyles = (palette) =>
       shadowOpacity: 0.06,
       elevation: 3,
     },
-
+    actionButtonPressed: {
+      transform: [{ scale: 0.97 }],
+    },
     actionIcon: {
       width: 40,
       height: 40,
       marginBottom: 6,
       resizeMode: 'contain',
     },
-
     actionText: {
       fontSize: 13,
       fontWeight: '600',
@@ -216,13 +219,11 @@ const createStyles = (palette) =>
       borderRadius: 12,
       alignSelf: 'center',
       marginTop: 16,
-      ...{
-        shadowColor: '#000',
-        shadowOpacity: 0.15,
-        shadowOffset: { width: 0, height: 3 },
-        shadowRadius: 6,
-        elevation: 4,
-      },
+      shadowColor: '#000',
+      shadowOpacity: 0.15,
+      shadowOffset: { width: 0, height: 3 },
+      shadowRadius: 6,
+      elevation: 4,
     },
     moreText: {
       color: palette.white,
@@ -267,6 +268,55 @@ const createStyles = (palette) =>
       shadowOffset: { width: 0, height: 2 },
       shadowRadius: 4,
       elevation: 3,
+    },
+    settingsModalBackdrop: {
+      flex: 1,
+      backgroundColor: 'rgba(0,0,0,0.35)',
+      justifyContent: 'flex-end',
+    },
+    settingsModalContainer: {
+      paddingHorizontal: 20,
+      paddingTop: 16,
+      paddingBottom: 24,
+      borderTopLeftRadius: 20,
+      borderTopRightRadius: 20,
+      borderWidth: 1,
+      width: '100%',
+      maxWidth: 520,
+      alignSelf: 'center',
+      backgroundColor: palette.card,
+      borderColor: palette.border,
+    },
+    settingsModalTitle: {
+      fontSize: 18,
+      fontWeight: '700',
+      textAlign: 'right',
+      marginBottom: 12,
+      color: palette.text,
+    },
+    settingsModalItems: {
+      marginTop: 8,
+    },
+    settingsModalItem: {
+      paddingVertical: 12,
+    },
+    settingsModalItemText: {
+      fontSize: 15,
+      textAlign: 'right',
+      color: palette.text,
+    },
+    settingsModalCloseButton: {
+      marginTop: 16,
+      paddingVertical: 10,
+      borderRadius: 12,
+      borderWidth: 1,
+      alignItems: 'center',
+      borderColor: palette.border,
+    },
+    settingsModalCloseText: {
+      fontSize: 15,
+      fontWeight: '600',
+      color: palette.primary,
     },
   });
 

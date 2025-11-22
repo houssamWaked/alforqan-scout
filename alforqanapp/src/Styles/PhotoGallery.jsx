@@ -1,3 +1,4 @@
+// src/Styles/PhotoGallery.js
 import { StyleSheet } from 'react-native';
 import { COLOR_SCHEMES } from '../../constants/colors';
 
@@ -7,9 +8,9 @@ const createStyles = (palette) =>
       flex: 1,
       backgroundColor: palette.background,
     },
-    scroll: {
-      flex: 1,
-    },
+
+    scroll: { flex: 1 },
+
     container: {
       maxWidth: 520,
       width: '100%',
@@ -68,13 +69,16 @@ const createStyles = (palette) =>
       elevation: 3,
     },
 
+    imageCardPressed: {
+      transform: [{ scale: 0.97 }],
+    },
+
     image: {
       width: '100%',
       height: 150,
     },
 
     loadingWrapper: {
-      flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
       paddingVertical: 40,
@@ -124,9 +128,7 @@ const createStyles = (palette) =>
     },
   });
 
-const galleryStyles = {
+export default {
   light: createStyles(COLOR_SCHEMES.light),
   dark: createStyles(COLOR_SCHEMES.dark),
 };
-
-export default galleryStyles;

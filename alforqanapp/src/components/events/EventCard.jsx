@@ -1,12 +1,21 @@
-import React, { memo, useCallback, useRef } from 'react';
+import React, { memo, useCallback, useMemo, useRef } from 'react';
 import { View, Text, Image, TouchableOpacity, Animated } from 'react-native';
 import { useRouter } from 'expo-router';
 
 import { getEventTypeLabel } from '../../constants/events';
+import eventsStyles from '../../Styles/EventsStyleSheet';
+import { useThemedStyles } from '../../hooks/useThemedStyles';
+import { EVENTS_TEXT } from '../../../constants/texts/eventsTexts';
 
-function EventCard({ event, styles }) {
+function EventCard({ event }) {
   const router = useRouter();
   const scale = useRef(new Animated.Value(1)).current;
+  const styles = useThemedStyles(eventsStyles);
+
+  const imageSource = useMemo(() => {
+    if (!event?.image) return null;
+    return typeof event.image === 'string' ? { uri: event.image } : event.image;
+  }, [event?.image]);
 
   const handlePressIn = useCallback(() => {
     Animated.spring(scale, {
@@ -31,7 +40,7 @@ function EventCard({ event, styles }) {
     router.push(`/events/${event.id}`);
   }, [router, event?.id]);
 
-  if (!styles || !event) return null;
+  if (!event) return null;
 
   return (
     <Animated.View style={{ transform: [{ scale }] }}>
@@ -42,16 +51,16 @@ function EventCard({ event, styles }) {
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
         accessibilityRole="button"
-        accessibilityLabel={event.title}
+        accessibilityLabel={event.title || EVENTS_TEXT.detailTitleFallback}
       >
-        {event.image && (
+        {imageSource ? (
           <Image
-            source={{ uri: event.image }}
+            source={imageSource}
             style={styles.cardImage}
             accessible
-            accessibilityLabel={event.title}
+            accessibilityLabel={event.title || EVENTS_TEXT.detailTitleFallback}
           />
-        )}
+        ) : null}
 
         <View style={styles.cardContent}>
           <View style={styles.cardHeaderRow}>
@@ -67,7 +76,7 @@ function EventCard({ event, styles }) {
 
           <View style={styles.cardMetaRow}>
             <Text style={styles.cardMetaText}>
-              {event.date} A� {event.time}
+              {event.date} | {event.time}
             </Text>
             <Text style={styles.cardMetaText}>{event.location}</Text>
           </View>
@@ -77,5 +86,6 @@ function EventCard({ event, styles }) {
   );
 }
 
-export default memo(EventCard);
+EventCard.displayName = 'EventCard';
 
+export default memo(EventCard);

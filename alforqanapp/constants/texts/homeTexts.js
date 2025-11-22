@@ -1,5 +1,9 @@
 export const HOME_TEXT = {
-  pinnedTitle: 'كشاف الشهر',
-  fallbackAnnounce: 'لا توجد أي إعلانات متاحة حاليًا.',
-  latestEventsTitle: 'أحدث الفعاليات',
+  pinnedTitle: 'إعلان مثبت',
+  fallbackAnnounce: 'لا يوجد أي إعلان حالياً.',
+  latestEventsTitle: 'آخر الأنشطة',
+  newsSectionTitle: 'آخر الأخبار',
+  announcementsError: 'تعذّر تحميل الإعلان حالياً.',
+  eventsError: 'تعذّر تحميل الأنشطة. يرجى المحاولة لاحقاً.',
+  eventsEmpty: 'لا توجد أنشطة حالياً.',
 };

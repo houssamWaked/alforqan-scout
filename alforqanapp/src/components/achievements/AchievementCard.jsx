@@ -1,11 +1,23 @@
 // components/achievements/AchievementCard.jsx
-import React, { memo, useCallback, useRef } from 'react';
+import React, { memo, useCallback, useMemo, useRef } from 'react';
 import { View, Text, Image, TouchableOpacity, Animated } from 'react-native';
 import { useRouter } from 'expo-router';
 
-function AchievementCard({ achievement, styles }) {
+import achievementsStyles from '../../Styles/AchievementsStyleSheet';
+import { useThemedStyles } from '../../hooks/useThemedStyles';
+import { ACHIEVEMENTS_TEXT } from '../../../constants/texts/achievementTexts';
+
+function AchievementCard({ achievement }) {
   const router = useRouter();
   const scale = useRef(new Animated.Value(1)).current;
+  const styles = useThemedStyles(achievementsStyles);
+
+  const imageSource = useMemo(() => {
+    if (!achievement?.image) return null;
+    return typeof achievement.image === 'string'
+      ? { uri: achievement.image }
+      : achievement.image;
+  }, [achievement?.image]);
 
   const handlePressIn = useCallback(() => {
     Animated.spring(scale, {
@@ -26,13 +38,14 @@ function AchievementCard({ achievement, styles }) {
   }, [scale]);
 
   const handlePress = useCallback(() => {
+    if (!achievement?.id) return;
     router.push({
       pathname: '/achievements/[id]',
       params: { id: String(achievement.id) },
     });
-  }, [router, achievement.id]);
+  }, [router, achievement?.id]);
 
-  if (!styles) return null;
+  if (!achievement) return null;
 
   return (
     <Animated.View style={{ transform: [{ scale }] }}>
@@ -43,20 +56,26 @@ function AchievementCard({ achievement, styles }) {
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
         accessibilityRole="button"
-        accessibilityLabel={achievement.title}
+        accessibilityLabel={
+          achievement.title || ACHIEVEMENTS_TEXT.detailTitle
+        }
       >
-        {achievement.image && (
+        {imageSource ? (
           <Image
-            source={{ uri: achievement.image }}
+            source={imageSource}
             style={styles.cardImage}
             accessible
-            accessibilityLabel={achievement.title}
+            accessibilityLabel={
+              achievement.title || ACHIEVEMENTS_TEXT.detailTitle
+            }
           />
-        )}
+        ) : null}
 
         <View style={styles.cardHeaderRow}>
           <View style={styles.badgeBubble}>
-            <Text style={styles.badgeText}>{achievement.badge}</Text>
+            <Text style={styles.badgeText}>
+              {achievement.badge || ACHIEVEMENTS_TEXT.badgeLabel}
+            </Text>
           </View>
           <Text style={styles.yearText}>{achievement.year}</Text>
         </View>
@@ -72,5 +91,7 @@ function AchievementCard({ achievement, styles }) {
     </Animated.View>
   );
 }
+
+AchievementCard.displayName = 'AchievementCard';
 
 export default memo(AchievementCard);

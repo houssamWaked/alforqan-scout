@@ -1,11 +1,27 @@
-import React from 'react';
-import { Text, TouchableOpacity, ScrollView } from 'react-native';
-import stylesSheet from '../../Styles/AchievementsStyleSheet';
-import { useThemedStyles } from '../../hooks/useThemedStyles';
-import { ACHIEVEMENT_FILTERS } from '../../../constants/texts/achievementTexts';
+import React, { memo, useMemo } from 'react';
+import { ScrollView, TouchableOpacity, Text, View } from 'react-native';
 
-export default function AchievementFilters({ activeFilter, setActiveFilter }) {
-  const styles = useThemedStyles(stylesSheet);
+import achievementsStyles from '../../Styles/AchievementsStyleSheet';
+import { useThemedStyles } from '../../hooks/useThemedStyles';
+
+function AchievementFilters({ filters, activeFilter, onChange }) {
+  const styles = useThemedStyles(achievementsStyles);
+  const list = useMemo(
+    () => (Array.isArray(filters) ? filters : []),
+    [filters]
+  );
+
+  const handlers = useMemo(() => {
+    const map = {};
+    list.forEach((filter) => {
+      map[filter.id] = () => {
+        if (typeof onChange === 'function') {
+          onChange(filter.id);
+        }
+      };
+    });
+    return map;
+  }, [list, onChange]);
 
   return (
     <ScrollView
@@ -13,23 +29,37 @@ export default function AchievementFilters({ activeFilter, setActiveFilter }) {
       showsHorizontalScrollIndicator={false}
       contentContainerStyle={styles.filtersContainer}
     >
-      {ACHIEVEMENT_FILTERS.map((filter) => {
-        const isActive = activeFilter === filter.id;
-        return (
-          <TouchableOpacity
-            key={filter.id}
-            style={[styles.filterChip, isActive && styles.filterChipActive]}
-            onPress={() => setActiveFilter(filter.id)}
-          >
-            <Text
-              style={[styles.filterText, isActive && styles.filterTextActive]}
+      <View style={styles.filtersRow}>
+        {list.map((filter) => {
+          const isActive = activeFilter === filter.id;
+          return (
+            <TouchableOpacity
+              key={filter.id}
+              onPress={handlers[filter.id]}
+              style={[
+                styles.filterChip,
+                isActive && styles.filterChipActive,
+              ]}
+              activeOpacity={0.8}
+              accessibilityRole="button"
+              accessibilityLabel={filter.label}
             >
-              {filter.label}
-            </Text>
-          </TouchableOpacity>
-        );
-      })}
+              <Text
+                style={[
+                  styles.filterText,
+                  isActive && styles.filterTextActive,
+                ]}
+              >
+                {filter.label}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
     </ScrollView>
   );
 }
 
+AchievementFilters.displayName = 'AchievementFilters';
+
+export default memo(AchievementFilters);

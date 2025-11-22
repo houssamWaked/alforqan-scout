@@ -1,6 +1,5 @@
 import { StyleSheet } from 'react-native';
 import { COLOR_SCHEMES } from '../../constants/colors';
-import sizing from '../../constants/sizing';
 
 const createStyles = (palette) =>
   StyleSheet.create({
@@ -12,35 +11,33 @@ const createStyles = (palette) =>
       flex: 1,
     },
     container: {
-      maxWidth: 520,
+      maxWidth: 540,
       width: '100%',
       alignSelf: 'center',
       paddingHorizontal: 16,
       paddingTop: 12,
       paddingBottom: 40,
     },
-
+    // List screen
     heroSection: {
-      marginBottom: 16,
-      alignItems: 'flex-end',
+      marginBottom: 12,
     },
     heroTitle: {
       fontSize: 22,
       fontWeight: '700',
       color: palette.text,
       textAlign: 'right',
-      marginBottom: 4,
     },
     heroSubtitle: {
       fontSize: 13,
       color: palette.subText,
       textAlign: 'right',
+      lineHeight: 20,
+      marginTop: 4,
     },
-
     filtersContainer: {
-      paddingVertical: 8,
-      paddingHorizontal: 2,
-      marginBottom: 8,
+      flexDirection: 'row',
+      marginBottom: 12,
     },
     filtersRow: {
       flexDirection: 'row',
@@ -67,19 +64,40 @@ const createStyles = (palette) =>
       color: palette.white,
       fontWeight: '600',
     },
-
     listWrapper: {
       marginTop: 4,
     },
     listContent: {
-      paddingBottom: 40,
+      paddingBottom: 24,
+      gap: 12,
     },
-
+    loadingWrapper: {
+      paddingVertical: 24,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    emptyWrapper: {
+      paddingVertical: 28,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    emptyText: {
+      fontSize: 14,
+      color: palette.subText,
+      textAlign: 'center',
+      lineHeight: 20,
+    },
+    errorText: {
+      color: palette.danger,
+      textAlign: 'center',
+      fontSize: 14,
+      marginVertical: 8,
+    },
     card: {
       backgroundColor: palette.card,
       borderRadius: 16,
-      marginBottom: 12,
       overflow: 'hidden',
+      marginBottom: 12,
       shadowColor: '#000',
       shadowOpacity: 0.06,
       shadowOffset: { width: 0, height: 3 },
@@ -97,7 +115,6 @@ const createStyles = (palette) =>
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      marginBottom: 6,
     },
     cardTitle: {
       fontSize: 16,
@@ -105,78 +122,80 @@ const createStyles = (palette) =>
       color: palette.text,
       textAlign: 'right',
       flex: 1,
-      marginLeft: 8,
     },
     cardTypeBadge: {
       borderRadius: 999,
-      paddingVertical: 2,
+      paddingVertical: 3,
       paddingHorizontal: 10,
       backgroundColor: palette.light.secondary,
     },
     cardTypeText: {
       fontSize: 12,
       color: palette.text,
+      fontWeight: '600',
     },
     cardMetaRow: {
       flexDirection: 'row',
       justifyContent: 'flex-end',
-      marginBottom: 4,
+      flexWrap: 'wrap',
+      marginTop: 6,
     },
     cardMetaText: {
       fontSize: 12,
       color: palette.subText,
-      marginLeft: 8,
       textAlign: 'right',
     },
-    emptyStateWrapper: {
-      paddingVertical: 40,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    emptyStateText: {
-      fontSize: 14,
-      color: palette.subText,
-      textAlign: 'center',
-    },
-
     // Detail screen
-    detailHeaderRow: {
+    headerRow: {
       flexDirection: 'row',
       alignItems: 'center',
-      marginBottom: 16,
+      justifyContent: 'space-between',
     },
-    detailBackButton: {
-      width: 36,
-      height: 36,
-      borderRadius: 18,
+    backButton: {
+      width: 38,
+      height: 38,
+      borderRadius: 19,
       alignItems: 'center',
       justifyContent: 'center',
       backgroundColor: palette.card,
       borderWidth: 1,
       borderColor: palette.border,
-      marginRight: 8,
+      shadowColor: '#000',
+      shadowOpacity: 0.08,
+      shadowOffset: { width: 0, height: 2 },
+      shadowRadius: 4,
+      elevation: 3,
     },
-    detailScreenTitle: {
+    headerTitle: {
+      flex: 1,
+      textAlign: 'center',
       fontSize: 18,
       fontWeight: '700',
       color: palette.text,
-      textAlign: 'right',
-      flex: 1,
+      marginHorizontal: 12,
+    },
+    headerSpacer: {
+      width: 38,
     },
     heroCard: {
       borderRadius: 20,
       overflow: 'hidden',
-      marginBottom: 16,
       backgroundColor: palette.card,
       shadowColor: '#000',
-      shadowOpacity: 0.06,
+      shadowOpacity: 0.08,
       shadowOffset: { width: 0, height: 3 },
-      shadowRadius: 6,
-      elevation: 3,
+      shadowRadius: 8,
+      elevation: 4,
     },
     heroImage: {
       width: '100%',
-      height: 220,
+      height: 240,
+    },
+    heroFallback: {
+      height: 240,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: palette.light.secondary,
     },
     heroOverlay: {
       position: 'absolute',
@@ -197,7 +216,6 @@ const createStyles = (palette) =>
       color: palette.white,
       textAlign: 'right',
       flex: 1,
-      marginLeft: 12,
     },
     detailTypeBadge: {
       borderRadius: 999,
@@ -216,25 +234,24 @@ const createStyles = (palette) =>
       flexDirection: 'row',
       justifyContent: 'flex-end',
       marginTop: 6,
+      flexWrap: 'wrap',
     },
     heroMetaText: {
       fontSize: 12,
       color: 'rgba(255,255,255,0.85)',
-      marginLeft: 8,
       textAlign: 'right',
     },
-
     infoSection: {
       backgroundColor: palette.card,
       borderRadius: 16,
       padding: 14,
       borderWidth: 1,
       borderColor: palette.border,
-      marginBottom: 16,
     },
     infoRow: {
       flexDirection: 'row',
       justifyContent: 'space-between',
+      alignItems: 'center',
       marginBottom: 6,
     },
     infoLabel: {
@@ -249,47 +266,20 @@ const createStyles = (palette) =>
       textAlign: 'right',
       flex: 1,
     },
-
     sectionTitle: {
-      fontSize: 16,
+      fontSize: 18,
       fontWeight: '700',
       color: palette.text,
-      marginBottom: 8,
       textAlign: 'right',
+      marginBottom: 8,
     },
-    descriptionText: {
+    bodyText: {
       fontSize: 14,
-      color: palette.subText,
+      color: palette.text,
       lineHeight: 22,
       textAlign: 'right',
-      marginBottom: 16,
     },
-
-    newsHeroControls: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      marginBottom: 12,
-    },
-    newsHeroArrow: {
-      width: 36,
-      height: 36,
-      borderRadius: 18,
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: palette.card,
-      borderWidth: 1,
-      borderColor: palette.border,
-      marginHorizontal: 8,
-    },
-    newsHeroArrowDisabled: {
-      opacity: 0.4,
-    },
-    newsHeroCounter: {
-      fontSize: 13,
-      color: palette.subText,
-    },
-
+    programList: {},
     programItem: {
       flexDirection: 'row',
       alignItems: 'flex-start',
@@ -305,26 +295,15 @@ const createStyles = (palette) =>
     },
     programContent: {
       flex: 1,
-      paddingRight: 10,
     },
     programTitle: {
       fontSize: 14,
       color: palette.text,
     },
-    programLine: {
-      position: 'absolute',
-      left: 0,
-      top: sizing.spacing.xs,
-      bottom: 0,
-      width: 2,
-      backgroundColor: palette.border,
-    },
-
     equipmentChipRow: {
       flexDirection: 'row',
       flexWrap: 'wrap',
       justifyContent: 'flex-end',
-      marginBottom: 16,
     },
     equipmentChip: {
       paddingVertical: 6,
@@ -338,16 +317,13 @@ const createStyles = (palette) =>
       fontSize: 13,
       color: palette.text,
     },
-
     ctaWrapper: {
       marginTop: 4,
-      marginBottom: 24,
+      marginBottom: 12,
     },
   });
 
-const eventsStyles = {
+export default {
   light: createStyles(COLOR_SCHEMES.light),
   dark: createStyles(COLOR_SCHEMES.dark),
 };
-
-export default eventsStyles;

@@ -1,49 +1,34 @@
-import React, { useMemo, useState } from 'react';
+import React from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import {
-  ScrollView,
-  View,
-  Text,
-  FlatList,
-  TouchableOpacity,
-} from 'react-native';
+import { ScrollView, Text, RefreshControl } from 'react-native';
 
 import eventsStyles from '../../src/Styles/EventsStyleSheet';
 import { useThemedStyles } from '../../src/hooks/useThemedStyles';
-import { EVENTS, isUpcomingEvent } from '../../src/constants/events';
-import EventCard from '../../src/components/events/EventCard';
-
-const FILTERS = [
-  { id: 'all', label: 'الكل' },
-  { id: 'upcoming', label: 'القادمة' },
-  { id: 'past', label: 'المنتهية' },
-  { id: 'camp', label: 'المخيمات' },
-  { id: 'competition', label: 'المسابقات' },
-  { id: 'service', label: 'الخدمة' },
-  { id: 'training', label: 'التدريب' },
-];
+import { useTheme } from '../../src/hooks/useTheme';
+import { useEvents } from '../../src/hooks/useEvents';
+import EventsHero from '../../src/components/events/EventsHero';
+import EventsFilters from '../../src/components/events/EventsFilters';
+import EventsList from '../../src/components/events/EventsList';
+import EventsLoading from '../../src/components/events/EventsLoading';
+import EventsEmptyState from '../../src/components/events/EventsEmptyState';
+import { EVENTS_TEXT } from '../../constants/texts/eventsTexts';
 
 export default function EventsListScreen() {
   const styles = useThemedStyles(eventsStyles);
-  const [activeFilter, setActiveFilter] = useState('all');
+  const { colors } = useTheme();
 
-  const filteredEvents = useMemo(() => {
-    if (!EVENTS || EVENTS.length === 0) return [];
-    switch (activeFilter) {
-      case 'upcoming':
-        return EVENTS.filter((event) => isUpcomingEvent(event.date));
-      case 'past':
-        return EVENTS.filter((event) => !isUpcomingEvent(event.date));
-      case 'camp':
-      case 'competition':
-      case 'service':
-      case 'training':
-        return EVENTS.filter((event) => event.type === activeFilter);
-      case 'all':
-      default:
-        return EVENTS;
-    }
-  }, [activeFilter]);
+  const {
+    filteredEvents,
+    loading,
+    error,
+    refresh,
+    refreshing,
+    filters,
+    activeFilter,
+    setActiveFilter,
+  } = useEvents();
+
+  const hasEvents = !!filteredEvents && filteredEvents.length > 0;
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -51,67 +36,31 @@ export default function EventsListScreen() {
         style={styles.scroll}
         contentContainerStyle={styles.container}
         keyboardShouldPersistTaps="handled"
+        refreshControl={
+          <RefreshControl
+            refreshing={!!refreshing}
+            onRefresh={refresh}
+            tintColor={colors.primary}
+          />
+        }
       >
-        {/* Hero section */}
-        <View style={styles.heroSection}>
-          <Text style={styles.heroTitle}>الفعاليات القادمة</Text>
-          <Text style={styles.heroSubtitle}>
-            المخيمات والمسابقات وأيام الخدمة في مكان واحد.
-          </Text>
-        </View>
+        <EventsHero />
 
-        {/* Filters */}
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.filtersContainer}
-        >
-          <View style={styles.filtersRow}>
-            {FILTERS.map((filter) => {
-              const isActive = activeFilter === filter.id;
-              return (
-                <TouchableOpacity
-                  key={filter.id}
-                  onPress={() => setActiveFilter(filter.id)}
-                  style={[
-                    styles.filterChip,
-                    isActive && styles.filterChipActive,
-                  ]}
-                >
-                  <Text
-                    style={[
-                      styles.filterText,
-                      isActive && styles.filterTextActive,
-                    ]}
-                  >
-                    {filter.label}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-        </ScrollView>
+        <EventsFilters
+          filters={filters}
+          activeFilter={activeFilter}
+          onChange={setActiveFilter}
+        />
 
-        {/* Event list */}
-        <View style={styles.listWrapper}>
-          {filteredEvents.length === 0 ? (
-            <View style={styles.emptyStateWrapper}>
-              <Text style={styles.emptyStateText}>
-                لا توجد فعاليات لهذا الفلتر حالياً.
-              </Text>
-            </View>
-          ) : (
-            <FlatList
-              data={filteredEvents}
-              keyExtractor={(item) => item.id.toString()}
-              renderItem={({ item }) => (
-                <EventCard event={item} styles={styles} />
-              )}
-              scrollEnabled={false}
-              contentContainerStyle={styles.listContent}
-            />
-          )}
-        </View>
+        {loading && !hasEvents ? (
+          <EventsLoading />
+        ) : error ? (
+          <Text style={styles.errorText}>{error || EVENTS_TEXT.listError}</Text>
+        ) : hasEvents ? (
+          <EventsList events={filteredEvents} />
+        ) : (
+          <EventsEmptyState />
+        )}
       </ScrollView>
     </SafeAreaView>
   );
