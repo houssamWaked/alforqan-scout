@@ -1,0 +1,1 @@
+Use `registerDeviceForPush` from `utils/NotificationSetup` once during app startup (for example in `app/_layout.jsx` or your root provider component) so that permissions are requested early and the Expo push token is stored in Supabase before any screens need it.
