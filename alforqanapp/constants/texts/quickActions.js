@@ -11,4 +11,10 @@ export const QUICK_ACTIONS = [
     icon: require('../../assets/images/icons8-badge-96.png'),
     route: '/profile/badges',
   },
+  {
+    id: 3,
+    title: 'الأخبار',
+    icon: require('../../assets/images/icon.png'),
+    route: '/news',
+  },
 ];
