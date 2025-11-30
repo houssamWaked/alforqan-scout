@@ -24,7 +24,7 @@ export function useEvents() {
 
       if (!isMounted.current) return;
 
-      setEvents(data || []);
+      setEvents(Array.isArray(data) ? data : []);
       setError(fetchError ? EVENTS_TEXT.listError : null);
     } catch {
       if (isMounted.current) setError(EVENTS_TEXT.listError);
@@ -46,6 +46,17 @@ export function useEvents() {
   const refresh = useCallback(() => {
     loadEvents(true);
   }, [loadEvents]);
+
+  const filterIds = useMemo(
+    () => EVENTS_TEXT.filters?.map((filter) => filter.id) || [],
+    []
+  );
+
+  useEffect(() => {
+    if (!filterIds.includes(activeFilter)) {
+      setActiveFilter('all');
+    }
+  }, [activeFilter, filterIds]);
 
   const filteredEvents = useMemo(() => {
     if (!events || events.length === 0) return [];
