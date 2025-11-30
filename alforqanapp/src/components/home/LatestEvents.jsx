@@ -16,7 +16,7 @@ import { HOME_TEXT } from '../../../constants/texts/homeTexts';
 const AnimatedTouchableOpacity =
   Animated.createAnimatedComponent(TouchableOpacity);
 
-const EventItem = memo(function EventItem({ item, styles }) {
+const EventItem = memo(function EventItem({ item, styles, onPress }) {
   const scale = useRef(new Animated.Value(1)).current;
 
   const handlePressIn = useCallback(() => {
@@ -42,6 +42,7 @@ const EventItem = memo(function EventItem({ item, styles }) {
       style={[styles.eventCard, { transform: [{ scale }] }]}
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
+      onPress={() => onPress?.(item)}
       activeOpacity={0.85}
       accessibilityRole="button"
       accessibilityLabel={item.title}
@@ -58,12 +59,14 @@ const EventItem = memo(function EventItem({ item, styles }) {
   );
 });
 
-function LatestEvents({ events }) {
+function LatestEvents({ events, onPressEvent }) {
   const styles = useThemedStyles(homeStyles);
 
   const renderItem = useCallback(
-    ({ item }) => <EventItem item={item} styles={styles} />,
-    [styles]
+    ({ item }) => (
+      <EventItem item={item} styles={styles} onPress={onPressEvent} />
+    ),
+    [styles, onPressEvent]
   );
 
   if (!events || events.length === 0) {

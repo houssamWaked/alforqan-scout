@@ -1,6 +1,8 @@
 // src/hooks/useLatestEvents.js
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { getLatestEvents } from '../services/eventService';
+import { notifyForEvents } from '../services/notificationService';
+import { isUpcomingEvent } from '../constants/events';
 
 export function useLatestEvents() {
   const isMounted = useRef(true);
@@ -12,10 +14,19 @@ export function useLatestEvents() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const { events } = await getLatestEvents({ limit: 5 });
+      const { events } = await getLatestEvents({
+        limit: 5,
+        onlyUpcoming: true,
+      });
       if (!isMounted.current) return;
-      setData(events || []);
+      const upcoming = (events || []).filter((event) =>
+        isUpcomingEvent(event?.date || event?.eventDateRaw)
+      );
+
+      setData(upcoming);
       setError(null);
+
+      notifyForEvents(upcoming).catch(() => {});
     } catch (err) {
       if (isMounted.current) {
         setError(err || true);

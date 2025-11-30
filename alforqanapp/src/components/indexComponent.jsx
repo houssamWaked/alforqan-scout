@@ -9,7 +9,6 @@ import { setOnboardingSeen } from '../services/onboardingService';
 import stylesSheet from '../Styles/indexStyleSheet';
 import { useThemedStyles } from '../hooks/useThemedStyles';
 import { useTheme } from '../hooks/useTheme';
-import typography from '../../constants/typography';
 import TEXT from '../../constants/texts/indexText';
 import PrimaryButton from './PrimaryButton';
 
@@ -17,7 +16,7 @@ export default function IndexComponent() {
   const router = useRouter();
   const { fadeAnim, scaleAnim } = useFadeAndScale();
   const styles = useThemedStyles(stylesSheet);
-  const { colors } = useTheme();
+  const { colors, typography } = useTheme();
 
   const animatedStyle = {
     opacity: fadeAnim,
@@ -51,11 +50,13 @@ export default function IndexComponent() {
           />
         </View>
 
-        <Text style={[typography.headings.h2, styles.title]}>{TEXT.title}</Text>
+        <Text style={[typography.display.hero, styles.title]}>
+          {TEXT.title}
+        </Text>
         <Text style={[typography.headings.h3, styles.subtitle]}>
           {TEXT.subtitle}
         </Text>
-        <Text style={[typography.body.small, styles.description]}>
+        <Text style={[typography.body.regular, styles.description]}>
           {TEXT.description}
         </Text>
 

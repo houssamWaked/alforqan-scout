@@ -321,6 +321,30 @@ const createStyles = (palette) =>
       marginTop: 4,
       marginBottom: 12,
     },
+    gallerySection: {
+      marginTop: 12,
+      marginBottom: 8,
+    },
+    galleryScroll: {
+      paddingVertical: 6,
+    },
+    galleryImageWrapper: {
+      marginLeft: 12,
+      borderRadius: 14,
+      overflow: 'hidden',
+      backgroundColor: palette.card,
+      borderWidth: 1,
+      borderColor: palette.border,
+      shadowColor: '#000',
+      shadowOpacity: 0.05,
+      shadowOffset: { width: 0, height: 2 },
+      shadowRadius: 4,
+      elevation: 3,
+    },
+    galleryImage: {
+      width: 240,
+      height: 150,
+    },
   });
 
 export default {

@@ -3,9 +3,11 @@ import { Text, Image, Pressable } from 'react-native';
 
 import homeStyles from '../../Styles/HomeStyleSheet';
 import { useThemedStyles } from '../../hooks/useThemedStyles';
+import { useTheme } from '../../hooks/useTheme';
 
 function NewsCard({ item, onPress }) {
   const styles = useThemedStyles(homeStyles);
+  const { typography } = useTheme();
   const { title, date, image } = item;
 
   const imageSource = useMemo(() => {
@@ -32,10 +34,13 @@ function NewsCard({ item, onPress }) {
       {imageSource && (
         <Image source={imageSource} style={styles.eventImage} />
       )}
-      <Text style={styles.eventTitle} numberOfLines={2}>
+      <Text
+        style={[typography.headings.h3, styles.eventTitle]}
+        numberOfLines={2}
+      >
         {title}
       </Text>
-      <Text style={styles.eventDate}>{date}</Text>
+      <Text style={[typography.body.small, styles.eventDate]}>{date}</Text>
     </Pressable>
   );
 }

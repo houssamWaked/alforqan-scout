@@ -9,12 +9,15 @@ import { EVENTS_TEXT } from '../../../constants/texts/eventsTexts';
 
 function EventHero({ event }) {
   const styles = useThemedStyles(eventsStyles);
-  const hasImage = !!event?.image;
+  const primaryImage = event?.image || event?.images?.[0];
+  const hasImage = !!primaryImage;
 
   const imageSource = useMemo(() => {
-    if (!event?.image) return null;
-    return typeof event.image === 'string' ? { uri: event.image } : event.image;
-  }, [event?.image]);
+    if (!primaryImage) return null;
+    return typeof primaryImage === 'string'
+      ? { uri: primaryImage }
+      : primaryImage;
+  }, [primaryImage]);
 
   return (
     <View style={styles.heroCard}>

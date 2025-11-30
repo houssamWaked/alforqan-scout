@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { Stack } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ThemeProvider } from '../src/context/ThemeContext';
+import { initNotifications } from '../src/services/notificationService';
 
 export default function RootLayout() {
   const [initialRoute, setInitialRoute] = useState(null);
@@ -24,6 +25,7 @@ export default function RootLayout() {
 
   useEffect(() => {
     checkFirstLaunch();
+    initNotifications().catch(() => {});
   }, [checkFirstLaunch]);
 
   if (!initialRoute) return null; // or <SplashScreen/>
@@ -36,7 +38,6 @@ export default function RootLayout() {
       >
         <Stack.Screen name="index" />
         <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="Settings" options={{ headerShown: false }} />
       </Stack>
     </ThemeProvider>
   );

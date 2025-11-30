@@ -32,11 +32,36 @@ function normalizeAnnouncements(rows = []) {
   }));
 }
 
+function toPinnedPayload(source) {
+  if (!source) return null;
+
+  if (typeof source === 'string') {
+    return { title: HOME_TEXT.pinnedTitle, content: source };
+  }
+
+  return {
+    title: source.title || HOME_TEXT.pinnedTitle,
+    content: source.content || HOME_TEXT.fallbackAnnounce,
+    id: source.id ?? null,
+    date: source.date ?? null,
+    image: source.image ?? null,
+    images: source.images ?? [],
+  };
+}
+
 export async function getPinnedAnnouncement() {
   let cached = null;
 
   try {
-    cached = await AsyncStorage.getItem(CACHE_KEY_PINNED);
+    const stored = await AsyncStorage.getItem(CACHE_KEY_PINNED);
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        cached = toPinnedPayload(parsed) || null;
+      } catch {
+        cached = toPinnedPayload(stored);
+      }
+    }
   } catch (error) {
     console.error('getPinnedAnnouncement cache read error:', error);
   }
@@ -53,20 +78,31 @@ export async function getPinnedAnnouncement() {
       throw error;
     }
 
-    const row = data && data.length > 0 ? data[0] : null;
-    const text = row?.message || cached || HOME_TEXT.fallbackAnnounce;
+    const [row] = normalizeAnnouncements(data || []);
+    const pinned = toPinnedPayload(row) || cached;
+    const fallback = {
+      title: HOME_TEXT.pinnedTitle,
+      content: HOME_TEXT.fallbackAnnounce,
+    };
+    const result = pinned || fallback;
 
     try {
-      await AsyncStorage.setItem(CACHE_KEY_PINNED, text);
+      await AsyncStorage.setItem(
+        CACHE_KEY_PINNED,
+        JSON.stringify(result)
+      );
     } catch (cacheError) {
       console.error('getPinnedAnnouncement cache write error:', cacheError);
     }
 
-    return text;
+    return result;
   } catch (error) {
     console.error('getPinnedAnnouncement error:', error);
     if (cached) return cached;
-    return HOME_TEXT.fallbackAnnounce;
+    return {
+      title: HOME_TEXT.pinnedTitle,
+      content: HOME_TEXT.fallbackAnnounce,
+    };
   }
 }
 

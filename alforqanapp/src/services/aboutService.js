@@ -1,9 +1,4 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { supabase } from '../lib/supabase';
-
-const CACHE_KEY = 'cache_about';
-const TABLE_NAME =
-  process.env.EXPO_PUBLIC_SUPABASE_ABOUT_TABLE || 'about';
+import { ABOUT_TEXT } from '../../constants/texts/aboutTexts';
 
 function normalizeHero(hero) {
   if (!hero) return null;
@@ -111,63 +106,9 @@ function normalizeAbout(data) {
   return hasContent ? normalized : null;
 }
 
-async function readCache() {
-  const cached = await AsyncStorage.getItem(CACHE_KEY);
-  if (!cached) return null;
-  try {
-    return JSON.parse(cached);
-  } catch {
-    return null;
-  }
-}
-
-async function fetchRemoteAbout() {
-  const { data, error } = await supabase
-    .from(TABLE_NAME)
-    .select('*')
-    .limit(1)
-    .maybeSingle();
-
-  if (error) {
-    throw error;
-  }
-
-  return data;
-}
-
-export async function getAbout(forceRefresh = false) {
-  let about = null;
-  let error = null;
-
-  try {
-    if (!forceRefresh) {
-      about = await readCache();
-    }
-
-    if (about && !forceRefresh) {
-      return { about: normalizeAbout(about), error: null };
-    }
-
-    const remote = await fetchRemoteAbout();
-    about = normalizeAbout(remote);
-
-    if (about) {
-      await AsyncStorage.setItem(
-        CACHE_KEY,
-        JSON.stringify(about)
-      );
-    } else {
-      await AsyncStorage.removeItem(CACHE_KEY);
-    }
-  } catch (err) {
-    error = err;
-
-    if (!about) {
-      about = normalizeAbout(await readCache());
-    }
-  }
-
-  return { about, error };
+export async function getAbout() {
+  const about = normalizeAbout(ABOUT_TEXT);
+  return { about, error: null };
 }
 
 export default getAbout;

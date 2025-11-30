@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { NEWS_TEXT } from '../../constants/texts/newsTexts';
 import { getNews } from '../services/newsService';
+import { notifyForNews } from '../services/notificationService';
 
 export function useNews() {
   const isMounted = useRef(true);
@@ -22,6 +23,8 @@ export function useNews() {
       const nonPinned = news?.filter((item) => !item.pinned) || [];
       setData(nonPinned);
       setError(fetchError ? NEWS_TEXT.listError : null);
+
+      notifyForNews(nonPinned).catch(() => {});
     } catch {
       if (isMounted.current) {
         setError(NEWS_TEXT.listError);

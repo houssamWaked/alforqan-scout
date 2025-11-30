@@ -18,16 +18,69 @@ function formatDate(publishedAt) {
   }
 }
 
+function parseImages(value) {
+  if (!value) return [];
+  if (Array.isArray(value)) return value.filter(Boolean);
+
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    if (!trimmed) return [];
+
+    try {
+      const parsed = JSON.parse(trimmed);
+      if (Array.isArray(parsed)) {
+        return parsed.filter(Boolean);
+      }
+    } catch {
+      // fall through to comma-split below
+    }
+
+    return trimmed
+      .split(',')
+      .map((part) => part.trim())
+      .filter(Boolean);
+  }
+
+  return [];
+}
+
+function normalizeImages(row) {
+  const candidates = [
+    row.images,
+    row.images_url,
+    row.image_urls,
+    row.imagesUrl,
+    row.imageUrls,
+  ];
+
+  for (const candidate of candidates) {
+    const parsed = parseImages(candidate);
+    if (parsed.length) return parsed;
+  }
+
+  return [];
+}
+
 function normalizeNewsItems(rows = []) {
-  return rows.map((row) => ({
-    id: row.id,
-    title: row.title,
-    date: formatDate(row.published_at),
-    content: row.message,
-    pinned: !!row.pinned,
-    image: row.image_url || row.image || null,
-    images: Array.isArray(row.images) ? row.images : [],
-  }));
+  return rows.map((row) => {
+    const images = normalizeImages(row);
+    const createdAt = row.created_at || null;
+    const updatedAt = row.updated_at || null;
+    const publishedAt = row.published_at || createdAt || updatedAt || null;
+
+    return {
+      id: row.id,
+      title: row.title,
+      date: formatDate(row.published_at),
+      content: row.message,
+      pinned: !!row.pinned,
+      publishedAtRaw: publishedAt,
+      createdAt,
+      updatedAt,
+      image: row.image_url || row.image || images[0] || null,
+      images,
+    };
+  });
 }
 
 async function readCache() {
@@ -45,14 +98,15 @@ export async function getNews(forceRefresh = false) {
   let error = null;
 
   try {
+    // 1) Try cache for fast render
     if (!forceRefresh) {
-      news = await readCache();
+      const cached = await readCache();
+      if (cached?.length) {
+        news = cached;
+      }
     }
 
-    if (news.length && !forceRefresh) {
-      return { news, error: null };
-    }
-
+    // 2) Always hit Supabase to keep data fresh (unless explicitly forced off)
     const { data, error: supabaseError } = await supabase
       .from('announcements')
       .select('*')
@@ -62,8 +116,10 @@ export async function getNews(forceRefresh = false) {
       throw supabaseError;
     }
 
-    news = normalizeNewsItems(data || []);
-    await AsyncStorage.setItem(CACHE_KEY, JSON.stringify(news));
+    const normalized = normalizeNewsItems(data || []);
+    news = normalized;
+
+    await AsyncStorage.setItem(CACHE_KEY, JSON.stringify(normalized));
   } catch (err) {
     error = err;
 
@@ -82,9 +138,44 @@ export async function getNewsById(id, options = {}) {
   const { news, error } = await getNews(forceRefresh);
 
   const targetId = String(id);
-  const item = news.find((row) => String(row.id) === targetId) || null;
+  let item = news.find((row) => String(row.id) === targetId) || null;
+  let detailError = error;
 
-  return { news: item, error };
+  const shouldFetchLatest =
+    forceRefresh || !item || !item.images || item.images.length === 0;
+
+  if (shouldFetchLatest) {
+    try {
+      const { data, error: supabaseError } = await supabase
+        .from('announcements')
+        .select('*')
+        .eq('id', targetId)
+        .single();
+
+      if (data) {
+        const [normalized] = normalizeNewsItems([data]);
+        item = normalized || item;
+
+        const updatedList = [...news];
+        const idx = updatedList.findIndex(
+          (row) => String(row.id) === targetId
+        );
+        if (idx >= 0) {
+          updatedList[idx] = item;
+          await AsyncStorage.setItem(
+            CACHE_KEY,
+            JSON.stringify(updatedList)
+          );
+        }
+      } else if (supabaseError) {
+        detailError = detailError || supabaseError;
+      }
+    } catch (err) {
+      detailError = detailError || err;
+    }
+  }
+
+  return { news: item, error: detailError };
 }
 
 export default getNews;

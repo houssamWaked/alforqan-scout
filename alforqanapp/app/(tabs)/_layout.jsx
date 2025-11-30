@@ -53,7 +53,7 @@ function TabsContent({ insets }) {
 
         {/* Events */}
         <Tabs.Screen
-          name="Events"
+          name="events"
           options={{
             title: 'الأنشطة',
             tabBarIcon: ({ focused, color }) => (
@@ -141,7 +141,7 @@ const createStyles = (colors, insets) => ({
   iconWrapper: (focused) => ({
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 8,
+    paddingHorizontal: 3,
     paddingVertical: focused ? 4 : 2,
   }),
 

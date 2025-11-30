@@ -3,14 +3,16 @@ import { View, Text } from 'react-native';
 
 import achievementsStyles from '../../Styles/AchievementsStyleSheet';
 import { useThemedStyles } from '../../hooks/useThemedStyles';
+import { useTypography } from '../../hooks/useTypography';
 import { ACHIEVEMENTS_TEXT } from '../../../constants/texts/achievementTexts';
 
 function AchievementsEmptyState({ message }) {
   const styles = useThemedStyles(achievementsStyles);
+  const typography = useTypography();
 
   return (
     <View style={styles.emptyWrapper}>
-      <Text style={styles.emptyText}>
+      <Text style={[typography.body.small, styles.emptyText]}>
         {message || ACHIEVEMENTS_TEXT.emptyList}
       </Text>
     </View>

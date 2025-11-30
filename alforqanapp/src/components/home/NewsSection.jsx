@@ -13,7 +13,7 @@ import { HOME_TEXT } from '../../../constants/texts/homeTexts';
 function NewsSection({ items, loading, error }) {
   const styles = useThemedStyles(homeStyles);
   const router = useRouter();
-  const { colors } = useTheme();
+  const { colors, typography } = useTheme();
 
   const handlePressNewsItem = useCallback(
     (item) => {
@@ -53,7 +53,9 @@ function NewsSection({ items, loading, error }) {
 
   return (
     <View style={styles.sectionContainer}>
-      <Text style={styles.sectionTitle}>{HOME_TEXT.newsSectionTitle}</Text>
+      <Text style={[typography.headings.h2, styles.sectionTitle]}>
+        {HOME_TEXT.newsSectionTitle}
+      </Text>
 
       <FlatList
         data={items}

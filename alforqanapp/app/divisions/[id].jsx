@@ -1,6 +1,13 @@
 import React, { useMemo } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ScrollView, View, Text, Image, TouchableOpacity } from 'react-native';
+import {
+  ActivityIndicator,
+  ScrollView,
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -10,6 +17,7 @@ import { useThemedStyles } from '../../src/hooks/useThemedStyles';
 import { useTheme } from '../../src/hooks/useTheme';
 import { getDivisionById } from '../../src/constants/divisions';
 import PrimaryButton from '../../src/components/PrimaryButton';
+import { useDivisionData } from '../../src/hooks/useDivisionData';
 
 export default function DivisionDetailScreen() {
   const { id } = useLocalSearchParams();
@@ -17,7 +25,12 @@ export default function DivisionDetailScreen() {
   const styles = useThemedStyles(divisionStyles);
   const { colors } = useTheme();
 
-  const division = useMemo(() => getDivisionById(id), [id]);
+  const staticDivision = useMemo(() => getDivisionById(id), [id]);
+  const { data, loading, error } = useDivisionData(id);
+
+  const division = data?.division || staticDivision;
+  const leaders = data?.leaders || [];
+  const members = data?.members || [];
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -41,6 +54,20 @@ export default function DivisionDetailScreen() {
             {division?.name || 'تفاصيل الوحدة'}
           </Text>
         </View>
+
+        {loading ? (
+          <View style={{ paddingVertical: 12, alignItems: 'center' }}>
+            <ActivityIndicator color={colors.primary} />
+          </View>
+        ) : null}
+
+        {error ? (
+          <View style={{ paddingVertical: 12 }}>
+            <Text style={{ color: colors.danger || colors.text }}>
+              Failed to load division members. Pull to refresh and try again.
+            </Text>
+          </View>
+        ) : null}
 
         {/* HERO */}
         <View style={styles.heroCard}>
@@ -156,13 +183,13 @@ export default function DivisionDetailScreen() {
         )}
 
         {/* MEMBERS */}
-        {division?.leaders?.length || division?.members?.length ? (
+        {leaders?.length || members?.length ? (
           <View>
             {/* Leaders - unchanged */}
             <Text style={styles.sectionTitle}>القادة</Text>
 
             <View style={styles.membersGrid}>
-              {division.leaders.map((leader) => {
+              {leaders.map((leader) => {
                 const initials = leader.name
                   ? leader.name
                       .split(' ')
@@ -194,7 +221,7 @@ export default function DivisionDetailScreen() {
             </View>
 
             {/* Horizontal Members Carousel */}
-            {division.members?.length > 0 && (
+            {members?.length > 0 && (
               <View>
                 <Text style={styles.sectionTitle}>الأعضاء</Text>
 
@@ -203,7 +230,7 @@ export default function DivisionDetailScreen() {
                   showsHorizontalScrollIndicator={false}
                   contentContainerStyle={styles.memberCarousel}
                 >
-                  {division.members.map((member) => {
+                  {members.map((member) => {
                     const initials = member.name
                       ? member.name
                           .split(' ')

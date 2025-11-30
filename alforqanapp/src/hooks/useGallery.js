@@ -1,9 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { getGallery } from '../services/galleryService';
-import {
-  GALLERY_TEXT,
-  GALLERY_FILTERS,
-} from '../../constants/texts/galleryTexts';
+import { GALLERY_TEXT } from '../../constants/texts/galleryTexts';
 
 export function useGallery() {
   const isMounted = useRef(true);
@@ -65,10 +62,51 @@ export function useGallery() {
     if (activeFilter === 'all') return images;
 
     const year = Number(activeFilter);
-    if (isNaN(year)) return images;
+    if (Number.isNaN(year)) return images;
 
-    return images.filter((img) => img.year === year);
+    return images.filter((img) => {
+      const imageYear = Number(img?.year);
+      if (!Number.isNaN(imageYear)) {
+        return imageYear === year;
+      }
+      return String(img?.year) === String(activeFilter);
+    });
   }, [images, activeFilter]);
+
+  // -----------------------------------------
+  // FILTER OPTIONS (derived from data)
+  // -----------------------------------------
+  const filters = useMemo(() => {
+    const yearSet = new Set();
+
+    images?.forEach((img) => {
+      const value = Number(img?.year);
+      if (!Number.isNaN(value)) {
+        yearSet.add(value);
+      }
+    });
+
+    const yearFilters = Array.from(yearSet)
+      .sort((a, b) => b - a)
+      .map((year) => ({
+        id: String(year),
+        label: String(year),
+      }));
+
+    return [
+      { id: 'all', label: GALLERY_TEXT.allFilterLabel || 'All' },
+      ...yearFilters,
+    ];
+  }, [images]);
+
+  useEffect(() => {
+    const hasActiveFilter = filters.some(
+      (filter) => filter.id === activeFilter
+    );
+    if (!hasActiveFilter) {
+      setActiveFilter('all');
+    }
+  }, [filters, activeFilter]);
 
   return {
     images,
@@ -79,7 +117,7 @@ export function useGallery() {
     refresh,
     activeFilter,
     setActiveFilter,
-    filters: GALLERY_FILTERS,
+    filters,
   };
 }
 

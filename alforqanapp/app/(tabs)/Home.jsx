@@ -7,8 +7,9 @@ import {
   ActivityIndicator,
   Text,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { useRouter } from 'expo-router';
 
 import PinnedAnnouncement from '../../src/components/home/PinnedAnnouncement';
 import NewsSection from '../../src/components/home/NewsSection';
@@ -38,6 +39,8 @@ function SectionDivider({ styles }) {
 export default function HomeScreen() {
   const styles = useThemedStyles(homeStyles);
   const { colors } = useTheme();
+  const router = useRouter();
+  const insets = useSafeAreaInsets();
 
   const {
     data: pinnedAnnouncement,
@@ -57,14 +60,27 @@ export default function HomeScreen() {
 
   const openSettings = useCallback(() => setSettingsVisible(true), []);
   const closeSettings = useCallback(() => setSettingsVisible(false), []);
+  const handleEventPress = useCallback(
+    (event) => {
+      if (!event?.id) return;
+      router.push({
+        pathname: '/events/[id]',
+        params: { id: String(event.id) },
+      });
+    },
+    [router]
+  );
 
   return (
-    <SafeAreaView edges={['top']} style={styles.safeArea}>
+    <SafeAreaView edges={['top', 'bottom']} style={styles.safeArea}>
       <SettingsModal visible={settingsVisible} onClose={closeSettings} />
 
       <ScrollView
         style={styles.scroll}
-        contentContainerStyle={styles.container}
+        contentContainerStyle={[
+          styles.container,
+          { paddingBottom: (styles.container?.paddingBottom || 0) + insets.bottom + 56 },
+        ]}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
@@ -108,7 +124,7 @@ export default function HomeScreen() {
         ) : eventsError ? (
           <Text style={styles.errorText}>{HOME_TEXT.eventsError}</Text>
         ) : (
-          <LatestEvents events={events} />
+          <LatestEvents events={events} onPressEvent={handleEventPress} />
         )}
 
         {/* QUICK ACTIONS */}

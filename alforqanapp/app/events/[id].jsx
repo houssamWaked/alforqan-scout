@@ -18,6 +18,7 @@ import EventInfo from '../../src/components/events/EventInfo';
 import EventDescription from '../../src/components/events/EventDescription';
 import EventProgram from '../../src/components/events/EventProgram';
 import EventEquipment from '../../src/components/events/EventEquipment';
+import EventGallery from '../../src/components/events/EventGallery';
 import EventCTA from '../../src/components/events/EventCTA';
 import EventLoading from '../../src/components/events/EventLoading';
 import EventErrorState from '../../src/components/events/EventErrorState';
@@ -97,6 +98,7 @@ export default function EventDetailScreen() {
         ) : (
           <>
             <EventHero event={event} />
+            <EventGallery images={event.images} />
             <EventInfo event={event} />
             <EventDescription description={event.description} />
             <EventProgram program={event.program} />

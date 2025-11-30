@@ -5,12 +5,14 @@ import { useRouter } from 'expo-router';
 
 import achievementsStyles from '../../Styles/AchievementsStyleSheet';
 import { useThemedStyles } from '../../hooks/useThemedStyles';
+import { useTheme } from '../../hooks/useTheme';
 import { ACHIEVEMENTS_TEXT } from '../../../constants/texts/achievementTexts';
 
 function AchievementCard({ achievement }) {
   const router = useRouter();
   const scale = useRef(new Animated.Value(1)).current;
   const styles = useThemedStyles(achievementsStyles);
+  const { typography } = useTheme();
 
   const imageSource = useMemo(() => {
     if (!achievement?.image) return null;
@@ -73,18 +75,20 @@ function AchievementCard({ achievement }) {
 
         <View style={styles.cardHeaderRow}>
           <View style={styles.badgeBubble}>
-            <Text style={styles.badgeText}>
+            <Text style={[typography.label, styles.badgeText]}>
               {achievement.badge || ACHIEVEMENTS_TEXT.badgeLabel}
             </Text>
           </View>
-          <Text style={styles.yearText}>{achievement.year}</Text>
+          <Text style={[typography.body.small, styles.yearText]}>
+            {achievement.year}
+          </Text>
         </View>
 
-        <Text style={styles.cardTitle} numberOfLines={2}>
+        <Text style={[typography.headings.h3, styles.cardTitle]} numberOfLines={2}>
           {achievement.title}
         </Text>
 
-        <Text style={styles.cardDescription} numberOfLines={2}>
+        <Text style={[typography.body.small, styles.cardDescription]} numberOfLines={2}>
           {achievement.description}
         </Text>
       </TouchableOpacity>
