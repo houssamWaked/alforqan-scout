@@ -51,7 +51,7 @@ export default function EventDetailScreen() {
     setScoutStatus,
     setNotes,
     handleSubmit,
-  } = useEventRegistration();
+  } = useEventRegistration({ eventId: event?.id || id });
 
   const handleBack = useCallback(() => {
     router.back();

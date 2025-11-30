@@ -12,9 +12,16 @@ function AchievementsEmptyState({ message }) {
 
   return (
     <View style={styles.emptyWrapper}>
-      <Text style={[typography.body.small, styles.emptyText]}>
-        {message || ACHIEVEMENTS_TEXT.emptyList}
-      </Text>
+      <View style={styles.emptyCard}>
+        <View style={styles.emptyArt}>
+          <View style={styles.emptyArtInner} />
+        </View>
+        <Text
+          style={[typography.headings.h3, styles.emptyText]}
+        >
+          {message || ACHIEVEMENTS_TEXT.emptyList}
+        </Text>
+      </View>
     </View>
   );
 }

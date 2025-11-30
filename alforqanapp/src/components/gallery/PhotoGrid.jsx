@@ -1,5 +1,5 @@
 // src/components/gallery/PhotoGrid.jsx
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import {
   View,
   ActivityIndicator,
@@ -7,6 +7,7 @@ import {
   Modal,
   Pressable,
   Image,
+  TouchableOpacity,
 } from 'react-native';
 
 import { useThemedStyles } from '../../hooks/useThemedStyles';
@@ -31,12 +32,60 @@ export default function PhotoGrid({ images, loading }) {
     );
   }
 
+  const featured = useMemo(() => images?.[0], [images]);
+  const rest = useMemo(
+    () => (images || []).slice(1),
+    [images]
+  );
+
+  // Simple two-column masonry distribution
+  const columns = useMemo(() => {
+    const colA = [];
+    const colB = [];
+    rest.forEach((img, index) => {
+      const target = index % 2 === 0 ? colA : colB;
+      target.push({ ...img, tall: index % 3 === 0 });
+    });
+    return [colA, colB];
+  }, [rest]);
+
   return (
     <>
-      {/* GRID */}
-      <View style={styles.grid}>
-        {images.map((img, i) => (
-          <ImageCard key={i} img={img} onPress={open} />
+      {/* FEATURED */}
+      {featured ? (
+        <TouchableOpacity
+          onPress={() => open(featured)}
+          activeOpacity={0.9}
+          style={styles.featuredCard}
+        >
+          <Image
+            source={{ uri: featured.image }}
+            style={styles.featuredImage}
+            resizeMode="cover"
+          />
+          {featured.caption ? (
+            <View style={styles.featuredOverlay}>
+              <Text style={styles.featuredCaption}>
+                {featured.caption}
+              </Text>
+            </View>
+          ) : null}
+        </TouchableOpacity>
+      ) : null}
+
+      {/* MASONRY GRID */}
+      <View style={styles.masonryRow}>
+        {columns.map((col, colIndex) => (
+          <View key={colIndex} style={styles.masonryColumn}>
+            {col.map((img, i) => (
+              <ImageCard
+                key={`${colIndex}-${i}`}
+                img={img}
+                onPress={open}
+                size={img.tall ? 'tall' : 'regular'}
+              />
+            ))}
+          </View>
         ))}
       </View>
 

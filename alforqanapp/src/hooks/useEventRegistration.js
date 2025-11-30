@@ -1,8 +1,9 @@
 import { useCallback, useMemo, useState } from 'react';
 import { Alert } from 'react-native';
+import { submitEventRegistration } from '../services/eventRegistrationService';
 
 export function useEventRegistration(options = {}) {
-  const { onSuccess } = options;
+  const { onSuccess, eventId } = options;
 
   const [visible, setVisible] = useState(false);
   const [name, setName] = useState('');
@@ -21,36 +22,54 @@ export function useEventRegistration(options = {}) {
     setVisible(false);
   }, []);
 
-  const handleSubmit = useCallback(() => {
+  const handleSubmit = useCallback(async () => {
     if (submitting) return;
+
+    const payload = {
+      name: name.trim(),
+      nationality: nationality.trim(),
+      residence: residence.trim(),
+      participationChoice,
+      scoutStatus,
+      notes: notes.trim(),
+    };
+
+    if (!payload.name) {
+      Alert.alert('تنبيه', 'الرجاء إدخال الاسم قبل المتابعة.');
+      return;
+    }
 
     setSubmitting(true);
 
     try {
-      const payload = {
-        name: name.trim(),
-        nationality: nationality.trim(),
-        residence: residence.trim(),
-        participationChoice,
-        scoutStatus,
-        notes: notes.trim(),
-      };
+      const { error } = await submitEventRegistration(eventId, payload);
 
-      if (onSuccess) {
-        onSuccess(payload);
+      if (error) {
+        Alert.alert(
+          'حدث خطأ',
+          'تعذر حفظ التسجيل، يرجى المحاولة مرة أخرى.'
+        );
+      } else {
+        if (onSuccess) {
+          onSuccess(payload);
+        }
+
+        Alert.alert(
+          'تم الإرسال',
+          'تم تسجيل طلب الانضمام بنجاح!'
+        );
+
+        setVisible(false);
+        setName('');
+        setNationality('');
+        setResidence('');
+        setNotes('');
       }
-
-      Alert.alert('تم التسجيل', 'تم تسجيل مشاركتك في هذا النشاط بنجاح!');
-
-      setVisible(false);
-      setName('');
-      setNationality('');
-      setResidence('');
-      setNotes('');
     } finally {
       setSubmitting(false);
     }
   }, [
+    eventId,
     name,
     nationality,
     notes,

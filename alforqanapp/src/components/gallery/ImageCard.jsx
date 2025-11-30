@@ -6,8 +6,9 @@ import { useThemedStyles } from '../../hooks/useThemedStyles';
 import galleryStyles from '../../Styles/PhotoGallery';
 import { GALLERY_TEXT } from '../../../constants/texts/galleryTexts';
 
-function ImageCard({ img, onPress }) {
+function ImageCard({ img, onPress, size = 'regular' }) {
   const styles = useThemedStyles(galleryStyles);
+  const heightStyle = size === 'tall' ? styles.imageTall : null;
 
   return (
     <Pressable
@@ -21,7 +22,7 @@ function ImageCard({ img, onPress }) {
     >
       <Image
         source={{ uri: img.image }}
-        style={styles.image}
+        style={[styles.image, heightStyle]}
         accessible
         accessibilityLabel={img.caption || GALLERY_TEXT.imageAlt}
       />

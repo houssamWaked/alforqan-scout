@@ -10,7 +10,7 @@ export default function FilterChip({ label, active, onPress }) {
     <TouchableOpacity
       style={[styles.filterChip, active && styles.filterChipActive]}
       onPress={onPress}
-      activeOpacity={0.7}
+      activeOpacity={0.9}
     >
       <Text style={[styles.filterText, active && styles.filterTextActive]}>
         {label}

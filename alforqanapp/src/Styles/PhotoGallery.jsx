@@ -22,22 +22,31 @@ const createStyles = (palette) =>
 
     filtersContainer: {
       flexDirection: 'row',
+      paddingVertical: 6,
+      paddingHorizontal: 2,
+      gap: 8,
       marginBottom: 12,
     },
 
     filterChip: {
-      paddingVertical: 6,
-      paddingHorizontal: 14,
-      borderRadius: 20,
+      paddingVertical: 8,
+      paddingHorizontal: 16,
+      borderRadius: 999,
       borderWidth: 1,
       borderColor: palette.border,
-      marginRight: 8,
       backgroundColor: palette.card,
+      shadowColor: '#000',
+      shadowOpacity: 0.05,
+      shadowOffset: { width: 0, height: 2 },
+      shadowRadius: 4,
+      elevation: 2,
     },
 
     filterChipActive: {
       backgroundColor: palette.primary,
       borderColor: palette.primary,
+      shadowOpacity: 0.12,
+      elevation: 4,
     },
 
     filterText: {
@@ -47,35 +56,76 @@ const createStyles = (palette) =>
 
     filterTextActive: {
       color: palette.white,
-      fontWeight: '600',
+      fontWeight: '700',
     },
 
-    grid: {
+    featuredCard: {
+      borderRadius: 20,
+      overflow: 'hidden',
+      backgroundColor: palette.card,
+      shadowColor: '#000',
+      shadowOpacity: 0.1,
+      shadowOffset: { width: 0, height: 6 },
+      shadowRadius: 12,
+      elevation: 6,
+      marginBottom: 16,
+    },
+
+    featuredImage: {
+      width: '100%',
+      height: 230,
+    },
+
+    featuredOverlay: {
+      position: 'absolute',
+      left: 0,
+      right: 0,
+      top: 0,
+      bottom: 0,
+      justifyContent: 'flex-end',
+      padding: 16,
+      backgroundColor: 'rgba(0,0,0,0.25)',
+    },
+
+    featuredCaption: {
+      color: palette.white,
+      fontSize: 14,
+      lineHeight: 20,
+      textAlign: 'right',
+    },
+
+    masonryRow: {
       flexDirection: 'row',
-      flexWrap: 'wrap',
-      justifyContent: 'space-between',
+      gap: 12,
+    },
+
+    masonryColumn: {
+      flex: 1,
+      gap: 12,
     },
 
     imageCard: {
-      width: '48%',
       backgroundColor: palette.card,
       borderRadius: 18,
-      marginBottom: 12,
       overflow: 'hidden',
       shadowColor: '#000',
-      shadowOpacity: 0.06,
-      shadowOffset: { width: 0, height: 3 },
-      shadowRadius: 6,
-      elevation: 3,
+      shadowOpacity: 0.08,
+      shadowOffset: { width: 0, height: 4 },
+      shadowRadius: 8,
+      elevation: 4,
     },
 
     imageCardPressed: {
-      transform: [{ scale: 0.97 }],
+      transform: [{ scale: 0.98 }],
     },
 
     image: {
       width: '100%',
-      height: 150,
+      height: 180,
+    },
+
+    imageTall: {
+      height: 240,
     },
 
     loadingWrapper: {

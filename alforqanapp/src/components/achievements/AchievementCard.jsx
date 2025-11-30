@@ -2,6 +2,7 @@
 import React, { memo, useCallback, useMemo, useRef } from 'react';
 import { View, Text, Image, TouchableOpacity, Animated } from 'react-native';
 import { useRouter } from 'expo-router';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 import achievementsStyles from '../../Styles/AchievementsStyleSheet';
 import { useThemedStyles } from '../../hooks/useThemedStyles';
@@ -75,6 +76,11 @@ function AchievementCard({ achievement }) {
 
         <View style={styles.cardHeaderRow}>
           <View style={styles.badgeBubble}>
+            <Ionicons
+              name="ribbon-outline"
+              size={16}
+              style={styles.badgeIcon}
+            />
             <Text style={[typography.label, styles.badgeText]}>
               {achievement.badge || ACHIEVEMENTS_TEXT.badgeLabel}
             </Text>
@@ -84,9 +90,29 @@ function AchievementCard({ achievement }) {
           </Text>
         </View>
 
-        <Text style={[typography.headings.h3, styles.cardTitle]} numberOfLines={2}>
-          {achievement.title}
-        </Text>
+        <View style={styles.cardHeaderRow}>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Ionicons
+              name={
+                achievement.type === 'camp'
+                  ? 'bonfire-outline'
+                  : achievement.type === 'service'
+                  ? 'hand-left-outline'
+                  : achievement.type === 'competition'
+                  ? 'trophy-outline'
+                  : 'medal-outline'
+              }
+              size={16}
+              style={styles.cardIcon}
+            />
+            <Text
+              style={[typography.headings.h3, styles.cardTitle]}
+              numberOfLines={2}
+            >
+              {achievement.title}
+            </Text>
+          </View>
+        </View>
 
         <Text style={[typography.body.small, styles.cardDescription]} numberOfLines={2}>
           {achievement.description}
