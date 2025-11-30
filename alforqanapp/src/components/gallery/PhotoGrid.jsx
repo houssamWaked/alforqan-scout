@@ -15,7 +15,7 @@ import galleryStyles from '../../Styles/PhotoGallery';
 import { useTheme } from '../../hooks/useTheme';
 import ImageCard from './ImageCard';
 
-export default function PhotoGrid({ images, loading }) {
+export default function PhotoGrid({ images = [], loading = false }) {
   const styles = useThemedStyles(galleryStyles);
   const { colors } = useTheme();
 
@@ -24,18 +24,15 @@ export default function PhotoGrid({ images, loading }) {
   const open = useCallback((img) => setActiveImage(img), []);
   const close = useCallback(() => setActiveImage(null), []);
 
-  if (loading) {
-    return (
-      <View style={styles.loadingWrapper}>
-        <ActivityIndicator size="large" color={colors.primary} />
-      </View>
-    );
-  }
-
-  const featured = useMemo(() => images?.[0], [images]);
-  const rest = useMemo(
-    () => (images || []).slice(1),
+  const normalizedImages = useMemo(
+    () => (Array.isArray(images) ? images : []),
     [images]
+  );
+
+  const featured = useMemo(() => normalizedImages[0], [normalizedImages]);
+  const rest = useMemo(
+    () => normalizedImages.slice(1),
+    [normalizedImages]
   );
 
   // Simple two-column masonry distribution
@@ -48,6 +45,14 @@ export default function PhotoGrid({ images, loading }) {
     });
     return [colA, colB];
   }, [rest]);
+
+  if (loading) {
+    return (
+      <View style={styles.loadingWrapper}>
+        <ActivityIndicator size="large" color={colors.primary} />
+      </View>
+    );
+  }
 
   return (
     <>
@@ -76,15 +81,18 @@ export default function PhotoGrid({ images, loading }) {
       {/* MASONRY GRID */}
       <View style={styles.masonryRow}>
         {columns.map((col, colIndex) => (
-          <View key={colIndex} style={styles.masonryColumn}>
-            {col.map((img, i) => (
-              <ImageCard
-                key={`${colIndex}-${i}`}
-                img={img}
-                onPress={open}
-                size={img.tall ? 'tall' : 'regular'}
-              />
-            ))}
+          <View key={`column-${colIndex}`} style={styles.masonryColumn}>
+            {col.map((img, i) => {
+              const cardKey = img?.id ?? `${colIndex}-${i}-${img?.image ?? 'img'}`;
+              return (
+                <ImageCard
+                  key={cardKey}
+                  img={img}
+                  onPress={open}
+                  size={img?.tall ? 'tall' : 'regular'}
+                />
+              );
+            })}
           </View>
         ))}
       </View>
