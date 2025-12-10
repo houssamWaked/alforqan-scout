@@ -13,8 +13,12 @@ function EventsList({ events }) {
   const { typography } = useTheme();
   const router = useRouter();
 
-  const featured = useMemo(() => events?.[0], [events]);
-  const rest = useMemo(() => (events || []).slice(1), [events]);
+  const sanitizedEvents = useMemo(
+    () => (Array.isArray(events) ? events.filter(Boolean) : []),
+    [events]
+  );
+  const featured = useMemo(() => sanitizedEvents[0], [sanitizedEvents]);
+  const rest = useMemo(() => sanitizedEvents.slice(1), [sanitizedEvents]);
 
   const openEvent = useCallback(
     (id) => {
@@ -41,6 +45,9 @@ function EventsList({ events }) {
           activeOpacity={0.9}
           onPress={() => openEvent(featured.id)}
           style={styles.featuredCard}
+          accessibilityRole="button"
+          accessibilityLabel={featured.title}
+          accessibilityHint={featured.date}
         >
           {featured.image ? (
             <Image
@@ -51,6 +58,8 @@ function EventsList({ events }) {
               }
               style={styles.featuredImage}
               resizeMode="cover"
+              accessible
+              accessibilityLabel={featured.title}
             />
           ) : null}
           <View style={styles.featuredOverlay}>
@@ -73,9 +82,10 @@ function EventsList({ events }) {
         <View style={styles.timelineWrapper}>
           <View style={styles.timelineLine} />
           {rest.map((item, index) => {
-            const { day, month } = formatDateParts(item.date);
+            const { day, month } = formatDateParts(item?.date);
+            const itemKey = item?.id ? `event-${item.id}` : `event-${index}`;
             return (
-              <View key={item.id || index} style={styles.timelineItem}>
+              <View key={itemKey} style={styles.timelineItem}>
                 <View style={styles.timelineBadge}>
                   <Text style={styles.timelineDay}>{day}</Text>
                   <Text style={styles.timelineMonth}>{month}</Text>
@@ -84,6 +94,9 @@ function EventsList({ events }) {
                   activeOpacity={0.88}
                   onPress={() => openEvent(item.id)}
                   style={styles.timelineCard}
+                  accessibilityRole="button"
+                  accessibilityLabel={item?.title}
+                  accessibilityHint={item?.date}
                 >
                   {item.image ? (
                     <Image
@@ -93,6 +106,8 @@ function EventsList({ events }) {
                           : item.image
                       }
                       style={styles.timelineImage}
+                      accessible
+                      accessibilityLabel={item?.title}
                     />
                   ) : null}
                   <View style={styles.timelineContent}>
@@ -120,10 +135,10 @@ function EventsList({ events }) {
                       </Text>
                     </View>
                     <Text style={[typography.body.small, styles.timelineMeta]}>
-                      {item.date} {item.time ? `| ${item.time}` : ''}
+                      {item?.date || ''} {item?.time ? `| ${item.time}` : ''}
                     </Text>
                     <Text style={[typography.body.small, styles.timelineMeta]}>
-                      {item.location}
+                      {item?.location || ''}
                     </Text>
                   </View>
                 </TouchableOpacity>

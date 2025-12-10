@@ -104,8 +104,6 @@ export function useCompetitionForm() {
 
     try {
       setSubmitting(true);
-      // For now, just log the payload. Replace with real API call later.
-      console.log('Competition registration:', payload);
       return payload;
     } finally {
       setSubmitting(false);

@@ -1,5 +1,5 @@
 // src/components/home/NewsSection.jsx
-import React, { memo, useCallback } from 'react';
+import React, { memo, useCallback, useMemo } from 'react';
 import { View, Text, FlatList, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 
@@ -14,6 +14,11 @@ function NewsSection({ items, loading, error }) {
   const styles = useThemedStyles(homeStyles);
   const router = useRouter();
   const { colors, typography } = useTheme();
+
+  const sanitizedItems = useMemo(
+    () => (Array.isArray(items) ? items.filter(Boolean) : []),
+    [items]
+  );
 
   const handlePressNewsItem = useCallback(
     (item) => {
@@ -31,7 +36,7 @@ function NewsSection({ items, loading, error }) {
     [handlePressNewsItem]
   );
 
-  if (loading && (!items || items.length === 0)) {
+  if (loading && sanitizedItems.length === 0) {
     return (
       <View style={styles.sectionContainer}>
         <ActivityIndicator color={colors.primary} />
@@ -47,7 +52,7 @@ function NewsSection({ items, loading, error }) {
     );
   }
 
-  if (!items || items.length === 0) {
+  if (sanitizedItems.length === 0) {
     return null;
   }
 
@@ -58,12 +63,18 @@ function NewsSection({ items, loading, error }) {
       </Text>
 
       <FlatList
-        data={items}
+        data={sanitizedItems}
         horizontal
         renderItem={renderItem}
-        keyExtractor={(item) => String(item.id)}
+        keyExtractor={(item, index) =>
+          item?.id ? String(item.id) : `news-${index}`
+        }
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.newsListContent}
+        accessibilityLabel={HOME_TEXT.newsSectionTitle}
+        initialNumToRender={4}
+        maxToRenderPerBatch={6}
+        removeClippedSubviews
       />
     </View>
   );
