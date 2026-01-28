@@ -4,7 +4,7 @@
     "slug": "alforqanapp",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/Logo.png",
+    "icon": "./assets/images/logo.png",
     "scheme": "alforqanapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -19,7 +19,8 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.houssamwaked.alforqanapp"
     },
     "web": {
       "output": "static",
@@ -52,6 +53,12 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "20e1c77b-50de-46cc-b54c-52b3003bb8a4"
+      }
     }
   }
 }
