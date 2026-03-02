@@ -45,7 +45,7 @@ export default function IndexComponent() {
       <Animated.View style={[styles.contentBox, animatedStyle]}>
         <View style={styles.logoCircle}>
           <Animated.Image
-            source={require('../../assets/images/logo.png')}
+            source={require('../../assets/images/logo-runtime.png')}
             style={[styles.logo, { transform: [{ scale: scaleAnim }] }]}
           />
         </View>

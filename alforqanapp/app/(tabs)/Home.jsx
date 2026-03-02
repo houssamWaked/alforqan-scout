@@ -60,6 +60,10 @@ export default function HomeScreen() {
 
   const openSettings = useCallback(() => setSettingsVisible(true), []);
   const closeSettings = useCallback(() => setSettingsVisible(false), []);
+  const openAdminDashboard = useCallback(() => {
+    setSettingsVisible(false);
+    router.push('/admin');
+  }, [router]);
   const handleEventPress = useCallback(
     (event) => {
       if (!event?.id) return;
@@ -73,7 +77,11 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView edges={['top', 'bottom']} style={styles.safeArea}>
-      <SettingsModal visible={settingsVisible} onClose={closeSettings} />
+      <SettingsModal
+        visible={settingsVisible}
+        onClose={closeSettings}
+        onOpenAdmin={openAdminDashboard}
+      />
 
       <ScrollView
         style={styles.scroll}

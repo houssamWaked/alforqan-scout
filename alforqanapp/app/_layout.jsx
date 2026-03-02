@@ -2,7 +2,10 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { Stack } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ThemeProvider } from '../src/context/ThemeContext';
-import { initNotifications } from '../src/services/notificationService';
+import {
+  initNotifications,
+  startRealtimeNotifications,
+} from '../src/services/notificationService';
 
 export default function RootLayout() {
   const [initialRoute, setInitialRoute] = useState(null);
@@ -26,6 +29,11 @@ export default function RootLayout() {
   useEffect(() => {
     checkFirstLaunch();
     initNotifications().catch(() => {});
+    const stopRealtimeNotifications = startRealtimeNotifications();
+
+    return () => {
+      stopRealtimeNotifications?.();
+    };
   }, [checkFirstLaunch]);
 
   if (!initialRoute) return null; // or <SplashScreen/>
@@ -38,6 +46,7 @@ export default function RootLayout() {
       >
         <Stack.Screen name="index" />
         <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="admin" />
       </Stack>
     </ThemeProvider>
   );
