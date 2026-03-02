@@ -5,6 +5,7 @@ import {
   ACHIEVEMENTS_TEXT,
 } from '../../constants/texts/achievementTexts';
 import { getAchievements } from '../services/achievementsService';
+import { ACHIEVEMENT_FILTER_TYPE } from '../constants/achievementTypes';
 
 export function useAchievements() {
   const isMounted = useRef(true);
@@ -13,7 +14,7 @@ export function useAchievements() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
-  const [activeFilter, setActiveFilter] = useState('all');
+  const [activeFilter, setActiveFilter] = useState(ACHIEVEMENT_FILTER_TYPE);
 
   const load = useCallback(async (forceRefresh = false) => {
     if (forceRefresh) setRefreshing(true);
@@ -50,7 +51,7 @@ export function useAchievements() {
   }, [load]);
 
   const filteredAchievements = useMemo(() => {
-    if (activeFilter === 'all') return achievements;
+    if (activeFilter === ACHIEVEMENT_FILTER_TYPE) return achievements;
     return achievements.filter((a) => a.type === activeFilter);
   }, [activeFilter, achievements]);
 

@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '../lib/supabase';
+import { normalizeAchievementType } from '../constants/achievementTypes';
 
 const CACHE_KEY = 'cache_achievements';
 
@@ -12,7 +13,7 @@ function normalizeAchievements(rows = []) {
     year: item.year || item.date || '',
     image: item.image || item.image_url || item.imageUrl || null,
     images: Array.isArray(item.images) ? item.images : [],
-    type: item.type || item.category || 'all',
+    type: normalizeAchievementType(item.type || item.category),
   }));
 }
 

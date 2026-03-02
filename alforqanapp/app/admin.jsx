@@ -28,6 +28,11 @@ import {
   saveDivisionMember,
 } from '../src/services/adminDivisionService';
 import { pickAndUploadImages } from '../src/services/adminImageService';
+import {
+  ACHIEVEMENT_FILTER_TYPE,
+  ACHIEVEMENT_TYPES,
+  normalizeAchievementType,
+} from '../src/constants/achievementTypes';
 
 function buildDatasetMap(factory) {
   return {
@@ -114,6 +119,10 @@ const ACHIEVEMENT_TYPE_OPTIONS = [
   { label: '??????', value: 'competition' },
   { label: '????', value: 'service' },
 ];
+
+const ADMIN_ACHIEVEMENT_TYPE_OPTIONS = ACHIEVEMENT_TYPE_OPTIONS.filter(
+  (option) => option.value !== ACHIEVEMENT_FILTER_TYPE
+);
 
 const DATASET_DEFINITIONS = [
   {
@@ -352,7 +361,7 @@ const DATASET_DEFINITIONS = [
         key: 'type',
         label: 'نوع الإنجاز',
         type: 'choice',
-        options: ACHIEVEMENT_TYPE_OPTIONS,
+        options: ADMIN_ACHIEVEMENT_TYPE_OPTIONS,
       },
       {
         key: 'image_url',
@@ -370,7 +379,7 @@ const DATASET_DEFINITIONS = [
       description: '',
       badge: '',
       year: String(new Date().getFullYear()),
-      type: 'all',
+      type: ACHIEVEMENT_TYPES[0],
       image_url: '',
       images: '',
     }),
@@ -379,7 +388,7 @@ const DATASET_DEFINITIONS = [
       description: row?.description ?? row?.details ?? '',
       badge: row?.badge ?? row?.badge_name ?? '',
       year: String(row?.year ?? row?.date ?? ''),
-      type: row?.type ?? row?.category ?? 'all',
+      type: normalizeAchievementType(row?.type ?? row?.category),
       image_url: row?.image_url ?? row?.image ?? row?.imageUrl ?? '',
       images: serializeListValue(row?.images),
     }),
@@ -388,7 +397,7 @@ const DATASET_DEFINITIONS = [
       description: formState.description.trim(),
       badge: toNullableText(formState.badge),
       year: toNullableText(formState.year),
-      type: formState.type,
+      type: normalizeAchievementType(formState.type),
       image_url: toNullableText(formState.image_url),
       images: normalizeListValue(formState.images),
     }),
