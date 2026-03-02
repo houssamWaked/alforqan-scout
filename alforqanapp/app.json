@@ -7,7 +7,7 @@
     "icon": "./assets/images/Logo.png",
     "scheme": "alforqanapp",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": false,
+
     "ios": {
       "supportsTablet": true
     },
@@ -41,7 +41,8 @@
           "color": "#1D4ED8",
           "mode": "production"
         }
-      ]
+      ],
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true,
