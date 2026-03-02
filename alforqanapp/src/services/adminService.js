@@ -12,14 +12,75 @@ const TABLE_CACHE_KEYS = {
   gallery_items: ['cache_gallery'],
 };
 
-async function clearTableCache(table) {
-  const keys = TABLE_CACHE_KEYS[table] || [];
+async function clearCacheKeys(keys) {
+  const uniqueKeys = [...new Set((keys || []).filter(Boolean))];
 
-  if (!keys.length) {
+  if (!uniqueKeys.length) {
     return;
   }
 
-  await AsyncStorage.multiRemove(keys);
+  await AsyncStorage.multiRemove(uniqueKeys);
+}
+
+async function clearTableCache(table) {
+  const keys = TABLE_CACHE_KEYS[table] || [];
+  await clearCacheKeys(keys);
+}
+
+function isMissingRelationError(error) {
+  const message = String(error?.message || '').toLowerCase();
+  return (
+    message.includes('does not exist') ||
+    message.includes('not exist') ||
+    error?.code === 'PGRST205' ||
+    error?.code === '42P01'
+  );
+}
+
+async function detachGalleryItemsFromEvent(eventId) {
+  const { error } = await supabase
+    .from('gallery_items')
+    .update({ event_id: null })
+    .eq('event_id', eventId);
+
+  if (error) {
+    throw error;
+  }
+}
+
+async function deleteEventRegistrations(eventId) {
+  try {
+    const { error } = await supabase
+      .from('event_registrations')
+      .delete()
+      .eq('event_id', eventId);
+
+    if (error) {
+      throw error;
+    }
+  } catch (error) {
+    if (isMissingRelationError(error)) {
+      return;
+    }
+
+    throw error;
+  }
+}
+
+async function deleteEventRow(eventId) {
+  await detachGalleryItemsFromEvent(eventId);
+  await deleteEventRegistrations(eventId);
+
+  const { error } = await supabase.from('events').delete().eq('id', eventId);
+
+  if (error) {
+    throw error;
+  }
+
+  await clearCacheKeys([
+    ...TABLE_CACHE_KEYS.events,
+    ...TABLE_CACHE_KEYS.gallery_items,
+  ]);
 }
 
 export async function listAdminRows({
@@ -81,6 +142,11 @@ export async function deleteAdminRow({ table, id }) {
   }
 
   try {
+    if (table === 'events') {
+      await deleteEventRow(id);
+      return { error: null };
+    }
+
     const { error } = await supabase.from(table).delete().eq('id', id);
 
     if (error) {
