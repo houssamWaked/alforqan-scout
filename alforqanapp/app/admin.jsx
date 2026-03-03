@@ -107,17 +107,17 @@ function removeImageAt(value, indexToRemove) {
 }
 
 const EVENT_TYPE_OPTIONS = [
-  { label: '?????', value: 'camp' },
-  { label: '??????', value: 'competition' },
-  { label: '????', value: 'service' },
-  { label: '?????', value: 'training' },
+  { label: '\u0645\u0639\u0633\u0643\u0631', value: 'camp' },
+  { label: '\u0645\u0633\u0627\u0628\u0642\u0629', value: 'competition' },
+  { label: '\u062e\u062f\u0645\u0629', value: 'service' },
+  { label: '\u062a\u062f\u0631\u064a\u0628', value: 'training' },
 ];
 
 const ACHIEVEMENT_TYPE_OPTIONS = [
-  { label: '???', value: 'all' },
-  { label: '?????', value: 'camp' },
-  { label: '??????', value: 'competition' },
-  { label: '????', value: 'service' },
+  { label: '\u0627\u0644\u0643\u0644', value: 'all' },
+  { label: '\u0645\u0639\u0633\u0643\u0631', value: 'camp' },
+  { label: '\u0645\u0633\u0627\u0628\u0642\u0629', value: 'competition' },
+  { label: '\u062e\u062f\u0645\u0629', value: 'service' },
 ];
 
 const ADMIN_ACHIEVEMENT_TYPE_OPTIONS = ACHIEVEMENT_TYPE_OPTIONS.filter(

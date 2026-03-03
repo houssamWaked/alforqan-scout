@@ -1,5 +1,5 @@
 // app/(tabs)/Home.jsx
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import {
   ScrollView,
   View,
@@ -25,6 +25,7 @@ import { HOME_TEXT } from '../../constants/texts/homeTexts';
 import homeStyles from '../../src/Styles/HomeStyleSheet';
 import { useThemedStyles } from '../../src/hooks/useThemedStyles';
 import { useTheme } from '../../src/hooks/useTheme';
+import { supabase } from '../../src/lib/supabase';
 
 // Reusable visual divider
 function SectionDivider({ styles }) {
@@ -41,20 +42,29 @@ export default function HomeScreen() {
   const { colors } = useTheme();
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const announcementRefreshTimerRef = useRef(null);
+  const eventRefreshTimerRef = useRef(null);
 
   const {
     data: pinnedAnnouncement,
     loading: announcementLoading,
     error: announcementError,
+    refresh: refreshAnnouncements,
   } = useAnnouncements();
 
   const {
     data: events,
     loading: eventsLoading,
     error: eventsError,
+    refresh: refreshEvents,
   } = useLatestEvents();
 
-  const { data: newsItems, loading: newsLoading, error: newsError } = useNews();
+  const {
+    data: newsItems,
+    loading: newsLoading,
+    error: newsError,
+    refresh: refreshNews,
+  } = useNews();
 
   const [settingsVisible, setSettingsVisible] = useState(false);
 
@@ -74,6 +84,72 @@ export default function HomeScreen() {
     },
     [router]
   );
+
+  const scheduleAnnouncementsRefresh = useCallback(() => {
+    if (announcementRefreshTimerRef.current) {
+      clearTimeout(announcementRefreshTimerRef.current);
+    }
+
+    announcementRefreshTimerRef.current = setTimeout(() => {
+      refreshAnnouncements();
+      refreshNews();
+      announcementRefreshTimerRef.current = null;
+    }, 300);
+  }, [refreshAnnouncements, refreshNews]);
+
+  const scheduleEventsRefresh = useCallback(() => {
+    if (eventRefreshTimerRef.current) {
+      clearTimeout(eventRefreshTimerRef.current);
+    }
+
+    eventRefreshTimerRef.current = setTimeout(() => {
+      refreshEvents();
+      eventRefreshTimerRef.current = null;
+    }, 300);
+  }, [refreshEvents]);
+
+  useEffect(() => {
+    const homeAnnouncementsChannel = supabase
+      .channel('home-announcements')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'announcements',
+        },
+        scheduleAnnouncementsRefresh
+      )
+      .subscribe();
+
+    const homeEventsChannel = supabase
+      .channel('home-events')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'events',
+        },
+        scheduleEventsRefresh
+      )
+      .subscribe();
+
+    return () => {
+      if (announcementRefreshTimerRef.current) {
+        clearTimeout(announcementRefreshTimerRef.current);
+        announcementRefreshTimerRef.current = null;
+      }
+
+      if (eventRefreshTimerRef.current) {
+        clearTimeout(eventRefreshTimerRef.current);
+        eventRefreshTimerRef.current = null;
+      }
+
+      supabase.removeChannel(homeAnnouncementsChannel).catch(() => {});
+      supabase.removeChannel(homeEventsChannel).catch(() => {});
+    };
+  }, [scheduleAnnouncementsRefresh, scheduleEventsRefresh]);
 
   return (
     <SafeAreaView edges={['top', 'bottom']} style={styles.safeArea}>
