@@ -1,22 +1,54 @@
-// src/constants/events.js
+const EVENT_TYPE_LABELS = {
+  camp: 'معسكر',
+  competition: 'مسابقة',
+  service: 'خدمة',
+  training: 'تدريب',
+};
 
-// Labels for filters
+function isAsciiSlug(value) {
+  return /^[a-z0-9 _-]+$/i.test(value);
+}
+
+function humanizeAsciiSlug(value) {
+  return value
+    .split(/[_\s-]+/)
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
+}
+
+export function normalizeEventType(value) {
+  const normalized = String(value || '').trim();
+
+  if (!normalized) {
+    return 'camp';
+  }
+
+  return isAsciiSlug(normalized) ? normalized.toLowerCase() : normalized;
+}
+
 export function getEventTypeLabel(type) {
-  switch (type) {
+  const normalized = normalizeEventType(type);
+  return EVENT_TYPE_LABELS[normalized] || humanizeAsciiSlug(normalized) || 'فعالية';
+}
+
+export function getEventTypeIcon(type) {
+  const normalized = normalizeEventType(type);
+
+  switch (normalized) {
     case 'camp':
-      return 'معسكر';
+      return 'bonfire-outline';
     case 'competition':
-      return 'مسابقة';
+      return 'trophy-outline';
     case 'service':
-      return 'خدمة';
+      return 'hand-left-outline';
     case 'training':
-      return 'تدريب';
+      return 'school-outline';
     default:
-      return 'فعالية غير معروفة';
+      return 'sparkles-outline';
   }
 }
 
-// Check if the event is upcoming
 export function isUpcomingEvent(dateString) {
   if (!dateString) return false;
   const today = new Date();

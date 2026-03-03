@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {
   ActivityIndicator,
   Image,
@@ -33,6 +39,8 @@ import {
   ACHIEVEMENT_TYPES,
   normalizeAchievementType,
 } from '../src/constants/achievementTypes';
+import { normalizeEventType } from '../src/constants/events';
+import { getGalleryCategoryLabel } from '../src/constants/galleryCategories';
 
 function buildDatasetMap(factory) {
   return {
@@ -40,6 +48,7 @@ function buildDatasetMap(factory) {
     events: factory(),
     achievements: factory(),
     gallery: factory(),
+    contactMessages: factory(),
     divisionMembers: factory(),
   };
 }
@@ -119,6 +128,12 @@ const ACHIEVEMENT_TYPE_OPTIONS = [
   { label: '\u0645\u0633\u0627\u0628\u0642\u0629', value: 'competition' },
   { label: '\u062e\u062f\u0645\u0629', value: 'service' },
 ];
+const Category_OPTIONS = [
+  { label: 'الأنشطة', value: 'activities' },
+  { label: 'الإنجازات', value: 'achievements' },
+  { label: 'الأخبار', value: 'news' },
+  { label: 'المعرض', value: 'gallery' },
+];
 
 const ADMIN_ACHIEVEMENT_TYPE_OPTIONS = ACHIEVEMENT_TYPE_OPTIONS.filter(
   (option) => option.value !== ACHIEVEMENT_FILTER_TYPE
@@ -127,45 +142,46 @@ const ADMIN_ACHIEVEMENT_TYPE_OPTIONS = ACHIEVEMENT_TYPE_OPTIONS.filter(
 const DATASET_DEFINITIONS = [
   {
     key: 'news',
-    label: 'الأخبار',
+    label: '???????',
     table: 'announcements',
     orderBy: 'published_at',
-    description: 'إعلانات الصفحة الرئيسية ومنشورات الأخبار.',
-    emptyLabel: 'لا توجد أخبار في قاعدة البيانات حالياً.',
+    description: '??????? ?????? ???????? ???????? ???????.',
+    emptyLabel: '?? ???? ????? ?? ????? ???????? ??????.',
     fields: [
       {
         key: 'title',
-        label: 'العنوان',
-        placeholder: 'تحديث نشاط شهر رمضان',
+        label: '???????',
+        placeholder: '????? ???? ??? ?????',
       },
       {
         key: 'message',
-        label: 'المحتوى',
-        placeholder: 'اكتب نص الإعلان الكامل هنا...',
+        label: '???????',
+        placeholder: '???? ?? ??????? ?????? ???...',
         type: 'multiline',
       },
       {
         key: 'published_at',
-        label: 'تاريخ النشر',
+        label: '????? ?????',
         placeholder: '2026-03-02T12:00:00Z',
-        helper: 'استخدم تاريخاً بصيغة ISO حتى يبقى الترتيب صحيحاً.',
+        helper: '?????? ??????? ????? ISO ??? ???? ??????? ??????.',
       },
       {
         key: 'image_url',
-        label: 'الصورة الرئيسية',
+        label: '?????? ????????',
         type: 'image',
       },
       {
         key: 'images',
-        label: 'صور إضافية',
+        label: '??? ??????',
         type: 'image-list',
-        helper: 'صور اختيارية تظهر في صفحة تفاصيل الخبر.',
+        helper: '??? ???????? ???? ?? ???? ?????? ?????.',
       },
       {
         key: 'pinned',
-        label: 'تثبيت الإعلان',
+        label: '????? ???????',
         type: 'boolean',
-        description: 'الإعلانات المثبتة تظهر في بطاقة الإعلان أعلى الصفحة الرئيسية.',
+        description:
+          '????????? ??????? ???? ?? ????? ??????? ???? ?????? ????????.',
       },
     ],
     createEmpty: () => ({
@@ -181,99 +197,102 @@ const DATASET_DEFINITIONS = [
       message: row?.message ?? '',
       published_at: row?.published_at ?? new Date().toISOString(),
       image_url: row?.image_url ?? row?.image ?? '',
-      images: serializeListValue(row?.images),
+      images: serializeListValue(
+        row?.images ?? row?.images_url ?? row?.image_urls
+      ),
       pinned: !!row?.pinned,
     }),
     serialize: (formState) => ({
       title: formState.title.trim(),
       message: formState.message.trim(),
-      published_at:
-        formState.published_at.trim() || new Date().toISOString(),
+      published_at: formState.published_at.trim() || new Date().toISOString(),
       image_url: toNullableText(formState.image_url),
       images: normalizeListValue(formState.images),
       pinned: !!formState.pinned,
     }),
     validate: (formState) => {
-      if (!formState.title.trim()) return 'العنوان مطلوب.';
-      if (!formState.message.trim()) return 'المحتوى مطلوب.';
+      if (!formState.title.trim()) return '??????? ?????.';
+      if (!formState.message.trim()) return '??????? ?????.';
       return null;
     },
-    getTitle: (row) => row?.title || 'خبر بدون عنوان',
+    getTitle: (row) => row?.title || '??? ???? ?????',
     getMeta: (row) => {
-      const status = row?.pinned ? 'مثبت' : 'عادي';
+      const status = row?.pinned ? '????' : '????';
       const publishedAt = row?.published_at
         ? formatSyncTime(row.published_at)
-        : 'بدون تاريخ نشر';
+        : '???? ????? ???';
       return `${status} | ${publishedAt}`;
     },
   },
   {
     key: 'events',
-    label: 'الأنشطة',
+    label: '???????',
     table: 'events',
     orderBy: 'event_date',
     ascending: true,
-    description: 'الأنشطة والمعسكرات والمسابقات والتسجيلات المرتبطة بها.',
-    emptyLabel: 'لا توجد أنشطة في قاعدة البيانات حالياً.',
+    description: '??????? ?????????? ?????????? ?????????? ???????? ???.',
+    emptyLabel: '?? ???? ????? ?? ????? ???????? ??????.',
     fields: [
       {
         key: 'title',
-        label: 'العنوان',
-        placeholder: 'معسكر خارجي نهاية الأسبوع',
+        label: '???????',
+        placeholder: '????? ????? ????? ???????',
       },
       {
         key: 'description',
-        label: 'الوصف',
-        placeholder: 'اشرح برنامج النشاط وهدفه...',
+        label: '?????',
+        placeholder: '???? ?????? ?????? ?????...',
         type: 'multiline',
       },
       {
         key: 'type',
-        label: 'نوع النشاط',
+        label: '??? ??????',
         type: 'choice',
         options: EVENT_TYPE_OPTIONS.filter((option) => option?.value),
+        allowCustom: true,
+        customPlaceholder: '???? ??? ????? ??????',
       },
       {
         key: 'event_date',
-        label: 'تاريخ النشاط',
+        label: '????? ??????',
         placeholder: '2026-03-14',
-        helper: 'استخدم الصيغة YYYY-MM-DD.',
+        helper: '?????? ?????? YYYY-MM-DD.',
       },
       {
         key: 'time',
-        label: 'الوقت',
-        placeholder: '09:00 صباحاً',
+        label: '?????',
+        placeholder: '09:00 ??????',
       },
       {
         key: 'location',
-        label: 'الموقع',
-        placeholder: 'المركز الكشفي',
+        label: '??????',
+        placeholder: '?????? ??????',
       },
       {
         key: 'leader',
-        label: 'المسؤول',
-        placeholder: 'القائد أحمد',
+        label: '???????',
+        placeholder: '?????? ????',
       },
       {
         key: 'image_url',
-        label: 'الصورة الرئيسية',
+        label: '?????? ????????',
         type: 'image',
       },
       {
         key: 'images',
-        label: 'صور إضافية',
+        label: '??? ??????',
         type: 'image-list',
       },
       {
         key: 'program',
-        label: 'برنامج النشاط',
-        placeholder: 'الوصول\nالافتتاح\nورشة عمل',
+        label: '?????? ??????',
+        placeholder: '??????\n????????\n???? ???',
         type: 'multiline',
       },
       {
         key: 'equipment',
-        label: 'المستلزمات المطلوبة',
-        placeholder: 'قنينة ماء\nدفتر ملاحظات',
+        label: '?????????? ????????',
+        placeholder: '????? ???\n???? ???????',
         type: 'multiline',
       },
     ],
@@ -293,7 +312,7 @@ const DATASET_DEFINITIONS = [
     deserialize: (row) => ({
       title: row?.title ?? row?.name ?? '',
       description: row?.description ?? row?.details ?? '',
-      type: row?.type ?? 'camp',
+      type: normalizeEventType(row?.type ?? row?.category),
       event_date: row?.event_date ?? row?.date ?? '',
       time: row?.time ?? row?.event_time ?? '',
       location: row?.location ?? row?.place ?? '',
@@ -303,12 +322,12 @@ const DATASET_DEFINITIONS = [
         row?.images ?? row?.images_url ?? row?.image_urls
       ),
       program: serializeListValue(row?.program),
-      equipment: serializeListValue(row?.equipment),
+      equipment: serializeListValue(row?.equipment ?? row?.equibment),
     }),
     serialize: (formState) => ({
       title: formState.title.trim(),
       description: formState.description.trim(),
-      type: formState.type,
+      type: normalizeEventType(formState.type),
       event_date: formState.event_date.trim(),
       time: toNullableText(formState.time),
       location: toNullableText(formState.location),
@@ -319,58 +338,60 @@ const DATASET_DEFINITIONS = [
       equipment: normalizeListValue(formState.equipment),
     }),
     validate: (formState) => {
-      if (!formState.title.trim()) return 'العنوان مطلوب.';
-      if (!formState.event_date.trim()) return 'تاريخ النشاط مطلوب.';
+      if (!formState.title.trim()) return '??????? ?????.';
+      if (!formState.event_date.trim()) return '????? ?????? ?????.';
       return null;
     },
-    getTitle: (row) => row?.title || row?.name || 'نشاط بدون عنوان',
+    getTitle: (row) => row?.title || row?.name || '???? ???? ?????',
     getMeta: (row) =>
-      `${getOptionLabel(EVENT_TYPE_OPTIONS, row?.type, 'نشاط')} | ${row?.event_date || row?.date || 'بدون تاريخ'}`,
+      `${getOptionLabel(EVENT_TYPE_OPTIONS, row?.type, '????')} | ${row?.event_date || row?.date || '???? ?????'}`,
   },
   {
     key: 'achievements',
-    label: 'الإنجازات',
+    label: '?????????',
     table: 'achievements',
     orderBy: 'year',
-    description: 'الجوائز والمحطات المهمة ونتائج المسابقات.',
-    emptyLabel: 'لا توجد إنجازات في قاعدة البيانات حالياً.',
+    description: '??????? ???????? ?????? ?????? ?????????.',
+    emptyLabel: '?? ???? ??????? ?? ????? ???????? ??????.',
     fields: [
       {
         key: 'title',
-        label: 'العنوان',
-        placeholder: 'المركز الأول على مستوى المنطقة',
+        label: '???????',
+        placeholder: '?????? ????? ??? ????? ???????',
       },
       {
         key: 'description',
-        label: 'الوصف',
-        placeholder: 'اشرح الإنجاز ولماذا هو مهم...',
+        label: '?????',
+        placeholder: '???? ??????? ?????? ?? ???...',
         type: 'multiline',
       },
       {
         key: 'badge',
-        label: 'الشارة',
-        placeholder: 'القيادة',
+        label: '??????',
+        placeholder: '???????',
       },
       {
         key: 'year',
-        label: 'السنة',
+        label: '?????',
         placeholder: '2026',
         keyboardType: 'numeric',
       },
       {
         key: 'type',
-        label: 'نوع الإنجاز',
+        label: '??? ???????',
         type: 'choice',
         options: ADMIN_ACHIEVEMENT_TYPE_OPTIONS,
+        allowCustom: true,
+        customPlaceholder: '???? ??? ????? ???????',
       },
       {
         key: 'image_url',
-        label: 'الصورة الرئيسية',
+        label: '?????? ????????',
         type: 'image',
       },
       {
         key: 'images',
-        label: 'صور إضافية',
+        label: '??? ??????',
         type: 'image-list',
       },
     ],
@@ -402,98 +423,115 @@ const DATASET_DEFINITIONS = [
       images: normalizeListValue(formState.images),
     }),
     validate: (formState) => {
-      if (!formState.title.trim()) return 'العنوان مطلوب.';
+      if (!formState.title.trim()) return '??????? ?????.';
       return null;
     },
-    getTitle: (row) => row?.title || row?.name || 'إنجاز بدون عنوان',
+    getTitle: (row) => row?.title || row?.name || '????? ???? ?????',
     getMeta: (row) =>
-      `${row?.badge || 'بدون شارة'} | ${row?.year || row?.date || 'بدون سنة'}`,
+      `${row?.badge || '???? ????'} | ${row?.year || row?.date || '???? ???'}`,
   },
   {
     key: 'gallery',
-    label: 'المعرض',
+    label: '??????',
     table: 'gallery_items',
     orderBy: 'year',
-    description: 'صور المعرض المستخدمة في شاشة الصور.',
-    emptyLabel: 'لا توجد صور في قاعدة البيانات حالياً.',
+    description: '??? ?????? ????????? ?? ???? ?????.',
+    emptyLabel: '?? ???? ??? ?? ????? ???????? ??????.',
     fields: [
       {
         key: 'caption',
-        label: 'التعليق',
-        placeholder: 'افتتاح المعسكر السنوي',
+        label: '???????',
+        placeholder: '?????? ??????? ??????',
+      },
+      {
+        key: 'category',
+        label: '?????',
+        type: 'picker',
+        placeholder: '???? ?????',
+        options: Category_OPTIONS,
       },
       {
         key: 'year',
-        label: 'السنة',
+        label: '?????',
         placeholder: '2026',
         keyboardType: 'numeric',
       },
       {
         key: 'image_url',
-        label: 'الصورة',
+        label: '??????',
         type: 'image',
       },
     ],
     createEmpty: () => ({
       caption: '',
+      category: Category_OPTIONS[0]?.value || '',
       year: String(new Date().getFullYear()),
       image_url: '',
     }),
     deserialize: (row) => ({
-      caption: row?.caption ?? '',
+      caption: row?.caption ?? row?.title ?? row?.description ?? '',
+      category: row?.category ?? Category_OPTIONS[0]?.value ?? '',
       year: String(row?.year ?? ''),
       image_url: row?.image_url ?? row?.image ?? row?.imageUrl ?? '',
     }),
     serialize: (formState) => ({
       caption: toNullableText(formState.caption),
+      category: toNullableText(formState.category),
       year: toNullableText(formState.year),
       image_url: toNullableText(formState.image_url),
     }),
     validate: (formState) => {
-      if (!formState.image_url.trim()) return 'رابط الصورة مطلوب.';
+      if (!formState.image_url.trim()) return '???? ?????? ?????.';
       return null;
     },
-    getTitle: (row) => row?.caption || 'صورة بدون عنوان',
-    getMeta: (row) => `السنة | ${row?.year || 'غير معروفة'}`,
+    getTitle: (row) =>
+      row?.caption ||
+      row?.title ||
+      row?.description ||
+      row?.category ||
+      '???? ???? ?????',
+    getMeta: (row) =>
+      `${getOptionLabel(Category_OPTIONS, row?.category, '???? ?????')} | ${row?.year || '??? ??????'}`,
   },
   {
     key: 'divisionMembers',
-    label: 'أعضاء الوحدات',
-    description: 'إضافة القادة والأعضاء وربطهم بالوحدة المناسبة.',
-    emptyLabel: 'لا توجد سجلات أعضاء للوحدات حالياً.',
+    label: '????? ???????',
+    description: '????? ?????? ???????? ?????? ??????? ????????.',
+    emptyLabel: '?? ???? ????? ????? ??????? ??????.',
     fields: [
       {
         key: 'division_id',
-        label: 'الوحدة',
+        label: '??????',
         type: 'choice',
         options: ({ divisionOptions }) => divisionOptions,
       },
       {
         key: 'full_name',
-        label: 'اسم العضو',
-        placeholder: 'محمد أحمد',
+        label: '??? ?????',
+        placeholder: '???? ????',
       },
       {
         key: 'role_name',
-        label: 'اسم الدور',
-        placeholder: 'قائد الوحدة أو عضو',
-        helper: 'سيتم إنشاء الدور تلقائياً إذا لم يكن موجوداً.',
+        label: '??? ?????',
+        placeholder: '???? ?????? ?? ???',
+        helper: '???? ????? ????? ???????? ??? ?? ??? ???????.',
       },
       {
         key: 'is_lead',
-        label: 'هذا الشخص قائد',
+        label: '??? ????? ????',
         type: 'boolean',
-        description: 'عند تفعيلها سيظهر السجل ضمن قسم القادة في صفحة الوحدة.',
+        description:
+          '??? ??????? ????? ????? ??? ??? ?????? ?? ???? ??????.',
       },
       {
         key: 'joined_at',
-        label: 'تاريخ الانضمام',
+        label: '????? ????????',
         placeholder: '2026-03-02',
-        helper: 'استخدم الصيغة YYYY-MM-DD.',
+        helper: '?????? ?????? YYYY-MM-DD.',
       },
       {
         key: 'avatar_url',
-        label: 'صورة العضو',
+        label: '???? ?????',
         type: 'image',
       },
     ],
@@ -522,21 +560,109 @@ const DATASET_DEFINITIONS = [
       avatar_url: toNullableText(formState.avatar_url),
     }),
     validate: (formState) => {
-      if (!formState.division_id) return 'الوحدة مطلوبة.';
-      if (!formState.full_name.trim()) return 'اسم العضو مطلوب.';
-      if (!formState.role_name.trim()) return 'اسم الدور مطلوب.';
-      if (!formState.joined_at.trim()) return 'تاريخ الانضمام مطلوب.';
+      if (!formState.division_id) return '?????? ??????.';
+      if (!formState.full_name.trim()) return '??? ????? ?????.';
+      if (!formState.role_name.trim()) return '??? ????? ?????.';
+      if (!formState.joined_at.trim()) return '????? ???????? ?????.';
       return null;
     },
-    getTitle: (row) => row?.full_name || 'عضو بدون اسم',
+    getTitle: (row) => row?.full_name || '??? ???? ???',
     getMeta: (row) =>
-      `${row?.divisionName || 'بدون وحدة'} | ${row?.role_name || 'بدون دور'} | ${row?.is_lead ? 'قائد' : 'عضو'}`,
+      `${row?.divisionName || '???? ????'} | ${row?.role_name || '???? ???'} | ${row?.is_lead ? '????' : '???'}`,
     list: listDivisionMembers,
     save: saveDivisionMember,
     remove: deleteDivisionMember,
   },
+  {
+    key: 'contactMessages',
+    label: '????? ???????',
+    table: 'contact_messages',
+    orderBy: 'received_at',
+    description: '??????? ??????? ?? ???? ????? ???? ???? ???????.',
+    emptyLabel: '?? ???? ????? ????? ?????? ??????.',
+    fields: [
+      {
+        key: 'name',
+        readOnly: true,
+        label: '?????',
+        placeholder: '??? ??????',
+      },
+      {
+        key: 'email',
+        label: '?????? ??????????',
+        placeholder: 'name@example.com',
+        keyboardType: 'email-address',
+        readOnly: true,
+      },
+      {
+        key: 'message',
+        label: '???????',
+        placeholder: '????? ???????',
+        type: 'multiline',
+        readOnly: true,
+      },
+      {
+        key: 'received_at',
+        readOnly: true,
+        label: '??? ????????',
+        placeholder: '2026-03-03T12:00:00Z',
+        helper: '????? ??? ????? ??????? ??? ??? ????? ??????? ?? ????? ????????.',
+      },
+      {
+        key: 'processed',
+        label: '??? ????????',
+        type: 'boolean',
+        description: '?????? ??? ?????? ??????? ?? ???? ?????.',
+      },
+      {
+        key: 'processed_at',
+        label: '??? ????????',
+        placeholder: '2026-03-03T13:00:00Z',
+        helper: '????? ?????? ??? ?? ??? ?????? ??????? ???.',
+      },
+    ],
+    disableCreate: true,
+    disableDelete: true,
+    createEmpty: () => ({
+      name: '',
+      email: '',
+      message: '',
+      received_at: new Date().toISOString(),
+      processed: false,
+      processed_at: '',
+    }),
+    deserialize: (row) => ({
+      name: row?.name ?? '',
+      email: row?.email ?? '',
+      message: row?.message ?? '',
+      received_at: row?.received_at ?? '',
+      processed: !!row?.processed,
+      processed_at: row?.processed_at ?? '',
+    }),
+    serialize: (formState) => ({
+      name: formState.name.trim(),
+      email: formState.email.trim(),
+      message: formState.message.trim(),
+      received_at: toNullableText(formState.received_at),
+      processed: !!formState.processed,
+      processed_at: toNullableText(formState.processed_at),
+    }),
+    validate: (formState) => {
+      if (!formState.name.trim()) return '????? ?????.';
+      if (!formState.email.trim()) return '?????? ?????????? ?????.';
+      if (!formState.message.trim()) return '??????? ??????.';
+      return null;
+    },
+    getTitle: (row) => row?.name || row?.email || '????? ???? ???',
+    getMeta: (row) => {
+      const email = row?.email || '???? ???? ????????';
+      const receivedAt = row?.received_at
+        ? formatSyncTime(row.received_at)
+        : '???? ???';
+      return `${email} | ${row?.processed ? '??? ????????' : '?????'} | ${receivedAt}`;
+    },
+  },
 ];
-
 const DATASET_BY_KEY = Object.fromEntries(
   DATASET_DEFINITIONS.map((definition) => [definition.key, definition])
 );
@@ -552,13 +678,7 @@ function SecondaryButton({ icon, iconColor, label, onPress, styles }) {
       accessibilityRole="button"
       accessibilityLabel={label}
     >
-      {icon ? (
-        <Ionicons
-          name={icon}
-          size={16}
-          color={iconColor}
-        />
-      ) : null}
+      {icon ? <Ionicons name={icon} size={16} color={iconColor} /> : null}
       <Text style={styles.secondaryButtonText}>{label}</Text>
     </Pressable>
   );
@@ -591,6 +711,7 @@ export default function AdminDashboardScreen() {
   const [deleteArmId, setDeleteArmId] = useState(null);
   const [uploadingFieldKey, setUploadingFieldKey] = useState(null);
   const [divisionOptions, setDivisionOptions] = useState([]);
+  const [openPickerKey, setOpenPickerKey] = useState(null);
 
   const activeDataset = DATASET_BY_KEY[activeDatasetKey];
   const activeRows = rowsByDataset[activeDatasetKey] || [];
@@ -598,6 +719,9 @@ export default function AdminDashboardScreen() {
   const activeLoading = loadingByDataset[activeDatasetKey];
   const selectedRecord =
     activeRows.find((row) => String(row?.id) === String(editingId)) || null;
+  const canCreateActiveRecord = !activeDataset?.disableCreate;
+  const canDeleteActiveRecord = !activeDataset?.disableDelete;
+  const canSaveActiveRecord = !!selectedRecord || canCreateActiveRecord;
   const isWideLayout = width >= 980;
   const adminContext = useMemo(
     () => ({
@@ -606,19 +730,25 @@ export default function AdminDashboardScreen() {
     [divisionOptions]
   );
 
-  const resetEditor = useCallback((datasetKey) => {
-    const definition = DATASET_BY_KEY[datasetKey];
-    setEditingId(null);
-    setFormState(definition.createEmpty(adminContext));
-    setDeleteArmId(null);
-  }, [adminContext]);
+  const resetEditor = useCallback(
+    (datasetKey) => {
+      const definition = DATASET_BY_KEY[datasetKey];
+      setEditingId(null);
+      setFormState(definition.createEmpty(adminContext));
+      setDeleteArmId(null);
+    },
+    [adminContext]
+  );
 
-  const selectRecord = useCallback((datasetKey, row) => {
-    const definition = DATASET_BY_KEY[datasetKey];
-    setEditingId(row?.id ?? null);
-    setFormState(definition.deserialize(row, adminContext));
-    setDeleteArmId(null);
-  }, [adminContext]);
+  const selectRecord = useCallback(
+    (datasetKey, row) => {
+      const definition = DATASET_BY_KEY[datasetKey];
+      setEditingId(row?.id ?? null);
+      setFormState(definition.deserialize(row, adminContext));
+      setDeleteArmId(null);
+    },
+    [adminContext]
+  );
 
   const loadDataset = useCallback(async (datasetKey) => {
     const definition = DATASET_BY_KEY[datasetKey];
@@ -716,6 +846,7 @@ export default function AdminDashboardScreen() {
       ...current,
       [key]: value,
     }));
+    setOpenPickerKey((current) => (current === key ? null : current));
   }, []);
 
   const handleRefreshAll = useCallback(async () => {
@@ -778,6 +909,14 @@ export default function AdminDashboardScreen() {
   const handleSave = useCallback(async () => {
     if (busyAction) return;
 
+    if (activeDataset.disableCreate && !editingId) {
+      setStatus({
+        kind: 'error',
+        message: 'اختر رسالة موجودة أولاً ثم حدّث حالة المعالجة.',
+      });
+      return;
+    }
+
     const validationMessage = activeDataset.validate(formState);
 
     if (validationMessage) {
@@ -831,9 +970,7 @@ export default function AdminDashboardScreen() {
     setBusyAction(null);
     setStatus({
       kind: 'success',
-      message: editingId
-        ? 'تم تحديث السجل بنجاح.'
-        : 'تم إنشاء السجل بنجاح.',
+      message: editingId ? 'تم تحديث السجل بنجاح.' : 'تم إنشاء السجل بنجاح.',
     });
   }, [
     activeDataset,
@@ -951,8 +1088,8 @@ export default function AdminDashboardScreen() {
                     isUploading
                       ? 'جارٍ الرفع...'
                       : value
-                      ? 'استبدال الصورة'
-                      : 'رفع صورة'
+                        ? 'استبدال الصورة'
+                        : 'رفع صورة'
                   }
                   onPress={() => handleImageUpload(field, false)}
                   styles={styles}
@@ -1010,7 +1147,10 @@ export default function AdminDashboardScreen() {
               {images.length ? (
                 <View style={styles.uploadGrid}>
                   {images.map((imageUrl, index) => (
-                    <View key={`${imageUrl}-${index}`} style={styles.uploadGridItem}>
+                    <View
+                      key={`${imageUrl}-${index}`}
+                      style={styles.uploadGridItem}
+                    >
                       <Image
                         source={{ uri: imageUrl }}
                         style={styles.uploadGridPreview}
@@ -1049,15 +1189,19 @@ export default function AdminDashboardScreen() {
 
       if (field.type === 'boolean') {
         const currentValue = !!formState[field.key];
+        const isReadOnly = !!field.readOnly;
 
         return (
           <View key={field.key} style={styles.fieldGroup}>
             <Pressable
-              onPress={() => handleFieldChange(field.key, !currentValue)}
+              onPress={() =>
+                !isReadOnly && handleFieldChange(field.key, !currentValue)
+              }
               style={styles.toggleRow}
               accessibilityRole="switch"
               accessibilityState={{ checked: currentValue }}
               accessibilityLabel={field.label}
+              disabled={isReadOnly}
             >
               <View style={styles.toggleLabelBlock}>
                 <Text style={styles.toggleTitle}>{field.label}</Text>
@@ -1090,6 +1234,10 @@ export default function AdminDashboardScreen() {
           typeof field.options === 'function'
             ? field.options(adminContext)
             : field.options || [];
+        const currentValue = String(formState[field.key] ?? '').trim();
+        const hasOptionMatch = options.some(
+          (option) => option.value === currentValue
+        );
 
         return (
           <View key={field.key} style={styles.fieldGroup}>
@@ -1097,7 +1245,7 @@ export default function AdminDashboardScreen() {
             {options.length ? (
               <View style={styles.choiceRow}>
                 {options.map((option) => {
-                  const isActive = formState[field.key] === option.value;
+                  const isActive = currentValue === option.value;
 
                   return (
                     <Pressable
@@ -1127,6 +1275,106 @@ export default function AdminDashboardScreen() {
                 لا توجد خيارات متاحة لهذا الحقل حالياً.
               </Text>
             )}
+            {field.allowCustom ? (
+              <TextInput
+                value={hasOptionMatch ? '' : currentValue}
+                onChangeText={(value) => handleFieldChange(field.key, value)}
+                placeholder={field.customPlaceholder || 'أدخل قيمة مخصصة'}
+                placeholderTextColor={colors.subText}
+                style={[styles.input, styles.choiceCustomInput]}
+                multiline={false}
+                keyboardType="default"
+                autoCapitalize="none"
+                autoCorrect={false}
+                accessibilityLabel={`${field.label} المخصص`}
+              />
+            ) : null}
+            {field.helper ? (
+              <Text style={styles.helperText}>{field.helper}</Text>
+            ) : null}
+          </View>
+        );
+      }
+
+      if (field.type === 'picker') {
+        const options =
+          typeof field.options === 'function'
+            ? field.options(adminContext)
+            : field.options || [];
+        const selectedValue = formState[field.key];
+        const selectedLabel =
+          field.key === 'category'
+            ? getGalleryCategoryLabel(selectedValue)
+            : getOptionLabel(
+          options,
+          selectedValue,
+          field.placeholder || 'اختر خيارا'
+        );
+        const isOpen = openPickerKey === field.key;
+
+        return (
+          <View key={field.key} style={styles.fieldGroup}>
+            <Text style={styles.fieldLabel}>{field.label}</Text>
+            <Pressable
+              onPress={() =>
+                setOpenPickerKey((current) =>
+                  current === field.key ? null : field.key
+                )
+              }
+              style={styles.pickerTrigger}
+              accessibilityRole="button"
+              accessibilityLabel={field.label}
+            >
+              <Ionicons
+                name={isOpen ? 'chevron-up-outline' : 'chevron-down-outline'}
+                size={18}
+                color={colors.subText}
+              />
+              <Text
+                style={[
+                  styles.pickerValue,
+                  !selectedValue && styles.pickerPlaceholder,
+                ]}
+              >
+                {selectedLabel}
+              </Text>
+            </Pressable>
+            {isOpen ? (
+              <View style={styles.pickerMenu}>
+                {options.map((option) => {
+                  const isActive = selectedValue === option.value;
+                  const optionLabel =
+                    field.key === 'category'
+                      ? getGalleryCategoryLabel(option.value)
+                      : option.label;
+
+                  return (
+                    <Pressable
+                      key={option.value}
+                      onPress={() => handleFieldChange(field.key, option.value)}
+                      style={[
+                        styles.pickerOption,
+                        isActive && styles.pickerOptionActive,
+                      ]}
+                      accessibilityRole="button"
+                      accessibilityLabel={`${field.label}: ${optionLabel}`}
+                    >
+                      <Text
+                        style={[
+                          styles.pickerOptionText,
+                          isActive && styles.pickerOptionTextActive,
+                        ]}
+                      >
+                        {optionLabel}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
+            ) : null}
+            {field.helper ? (
+              <Text style={styles.helperText}>{field.helper}</Text>
+            ) : null}
           </View>
         );
       }
@@ -1144,12 +1392,14 @@ export default function AdminDashboardScreen() {
             style={[
               styles.input,
               isMultiline && styles.inputMultiline,
+              field.readOnly && styles.inputReadOnly,
             ]}
             multiline={isMultiline}
             keyboardType={field.keyboardType || 'default'}
             autoCapitalize="none"
             autoCorrect={false}
             accessibilityLabel={field.label}
+            editable={!field.readOnly}
           />
           {field.helper ? (
             <Text style={styles.helperText}>{field.helper}</Text>
@@ -1166,6 +1416,7 @@ export default function AdminDashboardScreen() {
       formState,
       handleFieldChange,
       handleImageUpload,
+      openPickerKey,
       styles,
       uploadingFieldKey,
     ]
@@ -1194,8 +1445,8 @@ export default function AdminDashboardScreen() {
               <Text style={styles.heroTitle}>لوحة التحكم بالمحتوى</Text>
               <Text style={styles.heroDescription}>
                 أنشئ وعدل واحذف المحتوى المخزن في Supabase والذي يغذي التطبيق
-                العام. أي تعديل هنا ينعكس على الأخبار والأنشطة والإنجازات
-                ومعرض الصور.
+                العام. أي تعديل هنا ينعكس على الأخبار والأنشطة والإنجازات ومعرض
+                الصور.
               </Text>
             </View>
           </View>
@@ -1208,13 +1459,15 @@ export default function AdminDashboardScreen() {
               onPress={handleRefreshAll}
               styles={styles}
             />
-            <SecondaryButton
-              icon="add-outline"
-              iconColor={colors.text}
-              label={`إضافة ${activeDataset.label}`}
-              onPress={() => resetEditor(activeDatasetKey)}
-              styles={styles}
-            />
+            {canCreateActiveRecord ? (
+              <SecondaryButton
+                icon="add-outline"
+                iconColor={colors.text}
+                label={`????? ${activeDataset.label}`}
+                onPress={() => resetEditor(activeDatasetKey)}
+                styles={styles}
+              />
+            ) : null}
           </View>
 
           <View style={styles.heroNote}>
@@ -1278,19 +1531,15 @@ export default function AdminDashboardScreen() {
           </View>
 
           <View style={styles.toolbarRow}>
+            <Text style={styles.toolbarInfo}>{activeDataset.description}</Text>
             <Text style={styles.toolbarInfo}>
-              {activeDataset.description}
-            </Text>
-            <Text style={styles.toolbarInfo}>
-              آخر مزامنة: {formatSyncTime(lastSyncedByDataset[activeDatasetKey])}
+              آخر مزامنة:{' '}
+              {formatSyncTime(lastSyncedByDataset[activeDatasetKey])}
             </Text>
           </View>
 
           <View
-            style={[
-              styles.contentRow,
-              isWideLayout && styles.contentRowWide,
-            ]}
+            style={[styles.contentRow, isWideLayout && styles.contentRowWide]}
           >
             <View style={[styles.panel, styles.listPanel]}>
               <View style={styles.panelHeader}>
@@ -1305,26 +1554,15 @@ export default function AdminDashboardScreen() {
                   <ActivityIndicator color={colors.primary} />
                 </View>
               ) : activeError ? (
-                <View
-                  style={[
-                    styles.statusCard,
-                    styles.statusError,
-                  ]}
-                >
-                  <Text
-                    style={[
-                      styles.statusText,
-                      styles.statusTextError,
-                    ]}
-                  >
+                <View style={[styles.statusCard, styles.statusError]}>
+                  <Text style={[styles.statusText, styles.statusTextError]}>
                     {activeError}
                   </Text>
                 </View>
               ) : activeRows.length ? (
                 <View style={styles.recordList}>
                   {activeRows.map((row) => {
-                    const isSelected =
-                      String(row?.id) === String(editingId);
+                    const isSelected = String(row?.id) === String(editingId);
 
                     return (
                       <Pressable
@@ -1397,16 +1635,20 @@ export default function AdminDashboardScreen() {
               <View style={styles.actionsRow}>
                 <PrimaryButton
                   label={
-                    uploadingFieldKey
-                      ? 'انتظر حتى يكتمل رفع الصور'
-                      : busyAction === 'save'
-                      ? 'جارٍ الحفظ...'
-                      : selectedRecord
-                      ? 'حفظ التعديلات'
-                      : 'إنشاء السجل'
+                    !canSaveActiveRecord
+                      ? '???? ????? ????????'
+                      : uploadingFieldKey
+                        ? '????? ??? ????? ??? ?????'
+                        : busyAction === 'save'
+                          ? '???? ?????...'
+                          : selectedRecord
+                            ? '??? ?????????'
+                            : '????? ?????'
                   }
                   onPress={handleSave}
-                  disabled={!!busyAction || !!uploadingFieldKey}
+                  disabled={
+                    !!busyAction || !!uploadingFieldKey || !canSaveActiveRecord
+                  }
                   style={styles.growButton}
                 />
 
@@ -1422,7 +1664,7 @@ export default function AdminDashboardScreen() {
                   styles={styles}
                 />
 
-                {selectedRecord ? (
+                {selectedRecord && canDeleteActiveRecord ? (
                   <Pressable
                     onPress={handleDelete}
                     disabled={!!busyAction || !!uploadingFieldKey}
@@ -1439,8 +1681,8 @@ export default function AdminDashboardScreen() {
                       {busyAction === 'delete'
                         ? 'جارٍ الحذف...'
                         : deleteArmId === editingId
-                        ? 'تأكيد الحذف'
-                        : 'حذف'}
+                          ? 'تأكيد الحذف'
+                          : 'حذف'}
                     </Text>
                   </Pressable>
                 ) : null}

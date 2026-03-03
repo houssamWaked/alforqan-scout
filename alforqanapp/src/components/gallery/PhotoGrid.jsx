@@ -14,6 +14,7 @@ import { useThemedStyles } from '../../hooks/useThemedStyles';
 import galleryStyles from '../../Styles/PhotoGallery';
 import { useTheme } from '../../hooks/useTheme';
 import ImageCard from './ImageCard';
+import { getGalleryCategoryLabel } from '../../constants/galleryCategories';
 
 export default function PhotoGrid({ images = [], loading = false }) {
   const styles = useThemedStyles(galleryStyles);
@@ -68,11 +69,16 @@ export default function PhotoGrid({ images = [], loading = false }) {
             style={styles.featuredImage}
             resizeMode="cover"
           />
-          {featured.caption ? (
+          {featured.caption || featured.category ? (
             <View style={styles.featuredOverlay}>
-              <Text style={styles.featuredCaption}>
-                {featured.caption}
-              </Text>
+              {featured.category ? (
+                <Text style={styles.featuredCategory}>
+                  {getGalleryCategoryLabel(featured.category)}
+                </Text>
+              ) : null}
+              {featured.caption ? (
+                <Text style={styles.featuredCaption}>{featured.caption}</Text>
+              ) : null}
             </View>
           ) : null}
         </TouchableOpacity>
@@ -114,6 +120,11 @@ export default function PhotoGrid({ images = [], loading = false }) {
               />
             )}
 
+            {activeImage?.category ? (
+              <Text style={styles.modalCategory}>
+                {getGalleryCategoryLabel(activeImage.category)}
+              </Text>
+            ) : null}
             {activeImage?.caption ? (
               <Text style={styles.modalCaption}>{activeImage.caption}</Text>
             ) : null}

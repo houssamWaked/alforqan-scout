@@ -37,6 +37,17 @@ function isMissingRelationError(error) {
   );
 }
 
+function isMissingColumnError(error) {
+  const message = String(error?.message || '').toLowerCase();
+  return (
+    message.includes('schema cache') ||
+    message.includes('could not find the') ||
+    message.includes('column') ||
+    error?.code === 'PGRST204' ||
+    error?.code === '42703'
+  );
+}
+
 async function detachGalleryItemsFromEvent(eventId) {
   const { error } = await supabase
     .from('gallery_items')
@@ -93,10 +104,17 @@ export async function listAdminRows({
   }
 
   try {
-    const { data, error } = await supabase
-      .from(table)
-      .select('*')
-      .order(orderBy, { ascending });
+    let query = supabase.from(table).select('*');
+
+    if (orderBy) {
+      query = query.order(orderBy, { ascending });
+    }
+
+    let { data, error } = await query;
+
+    if (error && orderBy && isMissingColumnError(error)) {
+      ({ data, error } = await supabase.from(table).select('*'));
+    }
 
     if (error) {
       throw error;
@@ -114,11 +132,81 @@ export async function saveAdminRow({ table, id, values }) {
   }
 
   try {
-    const query = id
-      ? supabase.from(table).update(values).eq('id', id)
-      : supabase.from(table).insert([values]);
+    const buildQuery = (payload) =>
+      id
+        ? supabase.from(table).update(payload).eq('id', id)
+        : supabase.from(table).insert([payload]);
 
-    const { data, error } = await query.select().maybeSingle();
+    let payload = values;
+    let query = buildQuery(payload);
+
+    let { data, error } = await query.select().maybeSingle();
+
+    const errorMessage = String(error?.message || '').toLowerCase();
+
+    const missingEquipmentColumn =
+      table === 'events' &&
+      payload &&
+      Object.prototype.hasOwnProperty.call(payload, 'equipment') &&
+      errorMessage.includes('equipment');
+
+    if (missingEquipmentColumn) {
+      const { equipment, ...rest } = payload;
+      payload = {
+        ...rest,
+        equibment: equipment,
+      };
+      query = buildQuery(payload);
+      ({ data, error } = await query.select().maybeSingle());
+    }
+
+    const missingAchievementImagesColumn =
+      table === 'achievements' &&
+      payload &&
+      Object.prototype.hasOwnProperty.call(payload, 'images') &&
+      String(error?.message || '').toLowerCase().includes('images');
+
+    if (missingAchievementImagesColumn) {
+      const { images, ...rest } = payload;
+      const fallbackPayloads = [
+        { ...rest, image_urls: images },
+        { ...rest, images_url: images },
+        rest,
+      ];
+
+      for (const candidate of fallbackPayloads) {
+        query = buildQuery(candidate);
+        ({ data, error } = await query.select().maybeSingle());
+        if (!error) {
+          payload = candidate;
+          break;
+        }
+      }
+    }
+
+    const missingGalleryCaptionColumn =
+      table === 'gallery_items' &&
+      payload &&
+      Object.prototype.hasOwnProperty.call(payload, 'caption') &&
+      String(error?.message || '').toLowerCase().includes('caption');
+
+    if (missingGalleryCaptionColumn) {
+      const { caption, ...rest } = payload;
+      const fallbackPayloads = [
+        { ...rest, title: caption },
+        { ...rest, description: caption },
+        rest,
+      ];
+
+      for (const candidate of fallbackPayloads) {
+        query = buildQuery(candidate);
+        ({ data, error } = await query.select().maybeSingle());
+        if (!error) {
+          payload = candidate;
+          break;
+        }
+      }
+    }
 
     if (error) {
       throw error;

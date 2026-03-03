@@ -93,6 +93,18 @@ const createStyles = (palette) =>
       lineHeight: 20,
       textAlign: 'right',
     },
+    featuredCategory: {
+      alignSelf: 'flex-end',
+      marginBottom: 8,
+      paddingHorizontal: 10,
+      paddingVertical: 6,
+      borderRadius: 999,
+      backgroundColor: 'rgba(255,255,255,0.2)',
+      color: palette.white,
+      fontSize: 12,
+      fontWeight: '700',
+      textAlign: 'center',
+    },
 
     masonryRow: {
       flexDirection: 'row',
@@ -117,6 +129,21 @@ const createStyles = (palette) =>
 
     imageCardPressed: {
       transform: [{ scale: 0.98 }],
+    },
+    imageCategoryBadge: {
+      position: 'absolute',
+      right: 10,
+      bottom: 10,
+      borderRadius: 999,
+      backgroundColor: 'rgba(0,0,0,0.62)',
+      paddingHorizontal: 10,
+      paddingVertical: 6,
+    },
+    imageCategoryText: {
+      color: palette.white,
+      fontSize: 11,
+      fontWeight: '700',
+      textAlign: 'center',
     },
 
     image: {
@@ -175,6 +202,13 @@ const createStyles = (palette) =>
       textAlign: 'center',
       color: palette.text,
       fontSize: 14,
+    },
+    modalCategory: {
+      textAlign: 'center',
+      color: palette.primary,
+      fontSize: 13,
+      fontWeight: '700',
+      marginBottom: 6,
     },
   });
 

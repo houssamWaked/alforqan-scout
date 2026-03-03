@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { getGallery } from '../services/galleryService';
 import { GALLERY_TEXT } from '../../constants/texts/galleryTexts';
+import { getGalleryCategoryLabel } from '../constants/galleryCategories';
 
 export function useGallery() {
   const isMounted = useRef(true);
@@ -61,41 +62,33 @@ export function useGallery() {
 
     if (activeFilter === 'all') return images;
 
-    const year = Number(activeFilter);
-    if (Number.isNaN(year)) return images;
-
-    return images.filter((img) => {
-      const imageYear = Number(img?.year);
-      if (!Number.isNaN(imageYear)) {
-        return imageYear === year;
-      }
-      return String(img?.year) === String(activeFilter);
-    });
+    return images.filter((img) => img?.category === activeFilter);
   }, [images, activeFilter]);
 
   // -----------------------------------------
   // FILTER OPTIONS (derived from data)
   // -----------------------------------------
   const filters = useMemo(() => {
-    const yearSet = new Set();
+    const categorySet = new Set();
 
     images?.forEach((img) => {
-      const value = Number(img?.year);
-      if (!Number.isNaN(value)) {
-        yearSet.add(value);
+      if (img?.category) {
+        categorySet.add(img.category);
       }
     });
 
-    const yearFilters = Array.from(yearSet)
-      .sort((a, b) => b - a)
-      .map((year) => ({
-        id: String(year),
-        label: String(year),
+    const categoryFilters = Array.from(categorySet)
+      .sort((a, b) =>
+        getGalleryCategoryLabel(a).localeCompare(getGalleryCategoryLabel(b), 'ar')
+      )
+      .map((category) => ({
+        id: category,
+        label: getGalleryCategoryLabel(category),
       }));
 
     return [
       { id: 'all', label: GALLERY_TEXT.allFilterLabel || 'All' },
-      ...yearFilters,
+      ...categoryFilters,
     ];
   }, [images]);
 

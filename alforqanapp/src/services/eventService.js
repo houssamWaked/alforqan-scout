@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '../lib/supabase';
+import { normalizeEventType } from '../constants/events';
 
 const CACHE_KEY = 'cache_events';
 
@@ -52,8 +53,13 @@ function normalizeEvents(rows = []) {
       time: item.time || item.event_time || '',
       location: item.location || item.place || '',
       leader: item.leader || item.responsible || '',
+      type: normalizeEventType(item.type || item.category),
       program: Array.isArray(item.program) ? item.program : [],
-      equipment: Array.isArray(item.equipment) ? item.equipment : [],
+      equipment: Array.isArray(item.equipment)
+        ? item.equipment
+        : Array.isArray(item.equibment)
+        ? item.equibment
+        : [],
     };
   });
 }

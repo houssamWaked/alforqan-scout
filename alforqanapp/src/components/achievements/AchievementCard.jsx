@@ -8,6 +8,7 @@ import achievementsStyles from '../../Styles/AchievementsStyleSheet';
 import { useThemedStyles } from '../../hooks/useThemedStyles';
 import { useTheme } from '../../hooks/useTheme';
 import { ACHIEVEMENTS_TEXT } from '../../../constants/texts/achievementTexts';
+import { getAchievementTypeIcon } from '../../constants/achievementTypes';
 
 function AchievementCard({ achievement }) {
   const router = useRouter();
@@ -93,15 +94,7 @@ function AchievementCard({ achievement }) {
         <View style={styles.cardHeaderRow}>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <Ionicons
-              name={
-                achievement.type === 'camp'
-                  ? 'bonfire-outline'
-                  : achievement.type === 'service'
-                  ? 'hand-left-outline'
-                  : achievement.type === 'competition'
-                  ? 'trophy-outline'
-                  : 'medal-outline'
-              }
+              name={getAchievementTypeIcon(achievement.type)}
               size={16}
               style={styles.cardIcon}
             />

@@ -4,4 +4,6 @@ export const GALLERY_TEXT = {
   errorOffline:
     'حدث خطأ أثناء تحميل الصور. تأكد من اتصالك بالإنترنت وحاول مرة أخرى.',
   allFilterLabel: 'الكل',
+  openImageLabel: 'فتح الصورة',
+  imageAlt: 'صورة من المعرض',
 };

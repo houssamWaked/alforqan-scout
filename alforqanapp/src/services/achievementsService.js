@@ -4,17 +4,52 @@ import { normalizeAchievementType } from '../constants/achievementTypes';
 
 const CACHE_KEY = 'cache_achievements';
 
+function parseImages(value) {
+  if (!value) return [];
+  if (Array.isArray(value)) return value.filter(Boolean);
+
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    if (!trimmed) return [];
+
+    try {
+      const parsed = JSON.parse(trimmed);
+      if (Array.isArray(parsed)) return parsed.filter(Boolean);
+    } catch {
+      // fall through to comma split
+    }
+
+    return trimmed
+      .split(',')
+      .map((part) => part.trim())
+      .filter(Boolean);
+  }
+
+  return [];
+}
+
 function normalizeAchievements(rows = []) {
-  return rows.map((item) => ({
-    ...item,
-    title: item.title || item.name || '',
-    description: item.description || item.details || '',
-    badge: item.badge || item.badge_name || '',
-    year: item.year || item.date || '',
-    image: item.image || item.image_url || item.imageUrl || null,
-    images: Array.isArray(item.images) ? item.images : [],
-    type: normalizeAchievementType(item.type || item.category),
-  }));
+  return rows.map((item) => {
+    const imageCandidates = [
+      parseImages(item.images),
+      parseImages(item.images_url),
+      parseImages(item.image_urls),
+    ];
+
+    const images =
+      imageCandidates.find((list) => Array.isArray(list) && list.length) || [];
+
+    return {
+      ...item,
+      title: item.title || item.name || '',
+      description: item.description || item.details || '',
+      badge: item.badge || item.badge_name || '',
+      year: item.year || item.date || '',
+      image: item.image || item.image_url || item.imageUrl || null,
+      images,
+      type: normalizeAchievementType(item.type || item.category),
+    };
+  });
 }
 
 async function readCache() {

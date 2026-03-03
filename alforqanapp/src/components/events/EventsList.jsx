@@ -6,7 +6,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import eventsStyles from '../../Styles/EventsStyleSheet';
 import { useThemedStyles } from '../../hooks/useThemedStyles';
 import { useTheme } from '../../hooks/useTheme';
-import { getEventTypeLabel } from '../../constants/events';
+import { getEventTypeIcon, getEventTypeLabel } from '../../constants/events';
 
 function EventsList({ events }) {
   const styles = useThemedStyles(eventsStyles);
@@ -113,17 +113,7 @@ function EventsList({ events }) {
                   <View style={styles.timelineContent}>
                     <View style={styles.timelineHeader}>
                       <Ionicons
-                        name={
-                          item.type === 'camp'
-                            ? 'bonfire-outline'
-                            : item.type === 'service'
-                            ? 'hand-left-outline'
-                            : item.type === 'competition'
-                            ? 'trophy-outline'
-                            : item.type === 'training'
-                            ? 'school-outline'
-                            : 'sparkles-outline'
-                        }
+                        name={getEventTypeIcon(item.type)}
                         size={16}
                         style={styles.timelineIcon}
                       />

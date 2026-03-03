@@ -2,7 +2,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { EVENTS_TEXT } from '../../constants/texts/eventsTexts';
 import { getEvents } from '../services/eventService';
-import { isUpcomingEvent } from '../constants/events';
+import { getEventTypeLabel, isUpcomingEvent } from '../constants/events';
 
 export function useEvents() {
   const isMounted = useRef(true);
@@ -47,9 +47,30 @@ export function useEvents() {
     loadEvents(true);
   }, [loadEvents]);
 
+  const filters = useMemo(() => {
+    const baseFilters = (EVENTS_TEXT.filters || []).filter((filter) =>
+      ['all', 'upcoming', 'past'].includes(filter.id)
+    );
+
+    const typeFilters = Array.from(
+      new Set(
+        (events || [])
+          .map((item) => item?.type)
+          .filter(
+            (type) => type && !['all', 'upcoming', 'past'].includes(type)
+          )
+      )
+    ).map((type) => ({
+      id: type,
+      label: getEventTypeLabel(type),
+    }));
+
+    return [...baseFilters, ...typeFilters];
+  }, [events]);
+
   const filterIds = useMemo(
-    () => EVENTS_TEXT.filters?.map((filter) => filter.id) || [],
-    []
+    () => filters.map((filter) => filter.id),
+    [filters]
   );
 
   useEffect(() => {
@@ -66,14 +87,10 @@ export function useEvents() {
         return events.filter((item) => isUpcomingEvent(item.date));
       case 'past':
         return events.filter((item) => !isUpcomingEvent(item.date));
-      case 'camp':
-      case 'competition':
-      case 'service':
-      case 'training':
-        return events.filter((item) => item.type === activeFilter);
       case 'all':
-      default:
         return events;
+      default:
+        return events.filter((item) => item.type === activeFilter);
     }
   }, [activeFilter, events]);
 
@@ -84,7 +101,7 @@ export function useEvents() {
     error,
     refresh,
     refreshing,
-    filters: EVENTS_TEXT.filters,
+    filters,
     activeFilter,
     setActiveFilter,
   };

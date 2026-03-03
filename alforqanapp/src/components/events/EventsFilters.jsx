@@ -4,6 +4,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 
 import eventsStyles from '../../Styles/EventsStyleSheet';
 import { useThemedStyles } from '../../hooks/useThemedStyles';
+import { getEventTypeIcon } from '../../constants/events';
 
 function EventsFilters({ filters, activeFilter, onChange }) {
   const styles = useThemedStyles(eventsStyles);
@@ -35,15 +36,9 @@ function EventsFilters({ filters, activeFilter, onChange }) {
               ? 'time-outline'
               : filter.id === 'past'
               ? 'refresh-circle-outline'
-              : filter.id === 'camp'
-              ? 'bonfire-outline'
-              : filter.id === 'competition'
-              ? 'trophy-outline'
-              : filter.id === 'service'
-              ? 'hand-left-outline'
-              : filter.id === 'training'
-              ? 'school-outline'
-              : 'sparkles-outline';
+              : filter.id === 'all'
+                ? 'sparkles-outline'
+                : getEventTypeIcon(filter.id);
           return (
             <TouchableOpacity
               key={filter.id}

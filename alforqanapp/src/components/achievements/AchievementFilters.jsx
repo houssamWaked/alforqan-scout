@@ -4,6 +4,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 
 import achievementsStyles from '../../Styles/AchievementsStyleSheet';
 import { useThemedStyles } from '../../hooks/useThemedStyles';
+import { getAchievementTypeIcon } from '../../constants/achievementTypes';
 
 function AchievementFilters({ filters, activeFilter, onChange }) {
   const styles = useThemedStyles(achievementsStyles);
@@ -33,16 +34,7 @@ function AchievementFilters({ filters, activeFilter, onChange }) {
       <View style={styles.filtersRow}>
         {list.map((filter) => {
           const isActive = activeFilter === filter.id;
-          const iconName =
-            filter.id === 'all'
-              ? 'sparkles-outline'
-              : filter.id === 'service'
-              ? 'hand-left-outline'
-              : filter.id === 'competition'
-              ? 'trophy-outline'
-              : filter.id === 'camp'
-              ? 'bonfire-outline'
-              : 'medal-outline';
+          const iconName = getAchievementTypeIcon(filter.id);
           return (
             <TouchableOpacity
               key={filter.id}

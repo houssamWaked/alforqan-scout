@@ -1,11 +1,11 @@
 // hooks/useAchievements.js
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import {
-  ACHIEVEMENT_FILTERS,
-  ACHIEVEMENTS_TEXT,
-} from '../../constants/texts/achievementTexts';
+import { ACHIEVEMENTS_TEXT } from '../../constants/texts/achievementTexts';
 import { getAchievements } from '../services/achievementsService';
-import { ACHIEVEMENT_FILTER_TYPE } from '../constants/achievementTypes';
+import {
+  ACHIEVEMENT_FILTER_TYPE,
+  getAchievementTypeLabel,
+} from '../constants/achievementTypes';
 
 export function useAchievements() {
   const isMounted = useRef(true);
@@ -55,6 +55,31 @@ export function useAchievements() {
     return achievements.filter((a) => a.type === activeFilter);
   }, [activeFilter, achievements]);
 
+  const filters = useMemo(() => {
+    const typeFilters = Array.from(
+      new Set(
+        (achievements || [])
+          .map((item) => item?.type)
+          .filter((type) => type && type !== ACHIEVEMENT_FILTER_TYPE)
+      )
+    ).map((type) => ({
+      id: type,
+      label: getAchievementTypeLabel(type),
+    }));
+
+    return [
+      { id: ACHIEVEMENT_FILTER_TYPE, label: 'الكل' },
+      ...typeFilters,
+    ];
+  }, [achievements]);
+
+  useEffect(() => {
+    const hasActiveFilter = filters.some((filter) => filter.id === activeFilter);
+    if (!hasActiveFilter) {
+      setActiveFilter(ACHIEVEMENT_FILTER_TYPE);
+    }
+  }, [activeFilter, filters]);
+
   return {
     data: achievements,
     filteredAchievements,
@@ -64,7 +89,7 @@ export function useAchievements() {
     refreshing,
     activeFilter,
     setActiveFilter,
-    filters: ACHIEVEMENT_FILTERS,
+    filters,
   };
 }
 

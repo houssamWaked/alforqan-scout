@@ -436,10 +436,17 @@ const createStyles = (palette) =>
       minHeight: 104,
       textAlignVertical: 'top',
     },
+    inputReadOnly: {
+      opacity: 0.72,
+      backgroundColor: palette.background,
+    },
     choiceRow: {
       flexDirection: 'row-reverse',
       flexWrap: 'wrap',
       gap: 10,
+    },
+    choiceCustomInput: {
+      marginTop: 10,
     },
     choiceChip: {
       paddingHorizontal: 14,
@@ -461,6 +468,54 @@ const createStyles = (palette) =>
     },
     choiceChipTextActive: {
       color: palette.white,
+    },
+    pickerTrigger: {
+      minHeight: 48,
+      borderRadius: 16,
+      borderWidth: 1,
+      borderColor: palette.border,
+      backgroundColor: palette.card,
+      paddingHorizontal: 14,
+      paddingVertical: 12,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
+    pickerValue: {
+      flex: 1,
+      color: palette.text,
+      fontSize: 15,
+      textAlign: 'right',
+      marginLeft: 12,
+    },
+    pickerPlaceholder: {
+      color: palette.subText,
+    },
+    pickerMenu: {
+      marginTop: 8,
+      borderRadius: 16,
+      borderWidth: 1,
+      borderColor: palette.border,
+      backgroundColor: palette.card,
+      overflow: 'hidden',
+    },
+    pickerOption: {
+      paddingHorizontal: 14,
+      paddingVertical: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: palette.border,
+    },
+    pickerOptionActive: {
+      backgroundColor: palette.light.secondary,
+    },
+    pickerOptionText: {
+      color: palette.text,
+      fontSize: 14,
+      textAlign: 'right',
+      fontWeight: '600',
+    },
+    pickerOptionTextActive: {
+      color: palette.primary,
     },
     toggleRow: {
       flexDirection: 'row-reverse',

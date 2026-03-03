@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '../lib/supabase';
+import { normalizeGalleryCategory } from '../constants/galleryCategories';
 
 const CACHE_KEY = 'cache_gallery';
 
@@ -7,6 +8,8 @@ function normalizeGalleryItems(rows = []) {
   return rows.map((item) => ({
     ...item,
     image: item.image || item.image_url || item.imageUrl || null,
+    caption: item.caption || item.title || item.description || '',
+    category: normalizeGalleryCategory(item.category),
   }));
 }
 
